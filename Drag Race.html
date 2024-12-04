@@ -1,0 +1,4293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuPaul's Drag Race Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            min-height: 100vh;
+        }
+        .queen-card {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .track-record {
+            display: inline-block;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+        .RETURN { background-color: green; color: white; font-weight: bold; }
+        .WIN { background-color: royalblue; color: white; font-weight: bold; }
+        .track-record.WIN[data-as-runner="true"] { background-color: gold; color: black; }
+        .HIGH { background-color: lightblue; color: black}
+        .SAFE { background-color: #ececec; color: black; }
+        .LOW { background-color: lightpink; color: black; }
+        .BTM2 { background-color: tomato; color: black; }
+        .ELIM { background-color: #c0392b; color: white; font-weight: bold; }
+        .episode-container {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .top-three-selection {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .top-three-selection button {
+            margin: 5px;
+            padding: 8px 15px;
+            background: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .top-three-selection button:hover {
+            background: #7b1fa2;
+        }
+        .finale-container {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .team-challenge {
+            background: #e3f2fd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .queen-button {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #e74c3c;
+            color: white;
+        }
+        .queen-button:hover {
+            background: #c0392b;
+        }
+        .TOP2 { background-color: cyan; color: black; font-weight: bold;}
+        .producer-button {
+            margin: 5px;
+            padding: 8px 15px;
+            background: #9c27b0;
+            color: black;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .producer-button:hover {
+            background: #7b1fa2;
+        }
+        .producer-button.active {
+            background: #7b1fa2;
+            font-weight: bold;
+        }
+        .producer-controls {
+            margin-top: 10px;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .producer-button {
+            padding: 5px 10px;
+            margin: 0 3px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            background: white;
+        }
+        .producer-button.active {
+            background: #9c27b0;
+            color: white;
+            border-color: #7b1fa2;
+        }
+        .producer-button:hover {
+            opacity: 0.8;
+        }
+        .queen-image-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .queen-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 30px;
+            object-fit: cover;
+        }
+        .queen-performance {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .queen-performance-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .queen-performance-details {
+            flex-grow: 1;
+        }
+        .bottom-two-queens {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .bottom-queen {
+            text-align: center;
+        }
+        .queen-btm-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .finale-container .queen-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+        }
+        .challenge-info {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 5px solid #9c27b0;
+        }
+        .challenge-info p {
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        .challenge-info h4 {
+            color: #9c27b0;
+            margin: 5px 0;
+        }
+        .snatch-game-info, .ball-challenge-info {
+            background: #e3f2fd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 5px solid #2196f3;
+        }
+        .drama-section {
+            background: #fff3e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 5px solid #ff9800;
+        }
+        .top-three-selection .queen-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .queen-performance .queen-performance-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .bottom-queen .queen-btm-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .score-breakdown {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .score-breakdown p {
+            margin: 5px 0;
+        }
+        .producer-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .queen-producer-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .queen-producer-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .start-episode-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .start-episode-button:hover {
+            background: #7b1fa2;
+        }
+        .cast-selection {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .cast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .cast-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .cast-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .queen-mini-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            object-fit: cover;
+        }
+        .more-queens {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        .cast-select-button {
+            background: #9c27b0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .cast-select-button:hover {
+            background: #7b1fa2;
+        }
+        .placements-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .placement-category {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .top-two-section {
+            background: linear-gradient(to right, #ffd700, #fff8e7);
+            border-left: 5px solid gold;
+        }
+
+        .high-section {
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+            border-left: 5px solid lightblue;
+        }
+
+        .bottom-section {
+            background: linear-gradient(to right, tomato, #f79898);
+            border-left: 5px solid tomato;
+        }
+
+        .lipsync-section {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .lipsync-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .lipsync-button {
+            background: white;
+            color: #2c3e50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .lipsync-button:hover {
+            transform: scale(1.05);
+        }
+
+        .winner-section {
+            background: linear-gradient(to right, royalblue, rgb(232, 237, 255));
+            color: white;
+            border-left: 5px solid royalblue;
+        }
+
+        .safe-section {
+            background: linear-gradient(to right, #f5f5f5, #fff);
+            border-left: 5px solid #ececec;
+        }
+
+        .low-section {
+            background: linear-gradient(to right, #ffe5e5, #fff);
+            border-left: 5px solid lightpink;
+        }
+
+        .queen-performance {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.7);
+            transition: transform 0.2s;
+        }
+
+        .queen-performance:hover {
+            transform: translateX(5px);
+        }
+
+        .queen-performance-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .queen-performance-details h4 {
+            margin: 0;
+            color: black;
+            font-size: 0.9em;
+        }
+
+        .score-details {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .score-details p {
+            margin: 2px 0;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .queens-sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .episode-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .episode-navigation {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .producer-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 60px; /* Space for navigation */
+        }
+
+        .challenge-selector {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .challenge-selector select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .season-options {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .premiere-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        .premiere-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .toggle-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .WIN_AS { background-color: gold; color: black; font-weight: bold; }
+
+        .track-record.WIN {
+            background-color: royalblue;
+            color: white;
+            font-weight: bold;
+        }
+
+        .track-record.WIN.runner-up {
+            background-color: gold !important;
+            color: black;
+        }
+
+        .lipsync-queen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .lipsync-queen img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .track-record-container {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        .track-record-grid {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .track-record-row {
+            display: table-row;
+            border-bottom: 1px solid #eee;
+        }
+
+        .track-record-row:last-child {
+            border-bottom: none;
+        }
+
+        .track-record-row > * {
+            display: table-cell;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        .queen-mini-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .queen-name {
+            font-weight: bold;
+            padding: 0 20px;
+            white-space: nowrap;
+        }
+
+        .track-record-entries {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .track-record-entries .track-record {
+            width: 45px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+
+        .track-record.WINNER {
+            background: linear-gradient(to right, #FFD700, #FFA500);
+            color: black;
+            font-weight: bold;
+        }
+
+        .track-record.RUNNER-UP {
+            background: linear-gradient(to right, #C0C0C0, #A9A9A9);
+            color: black;
+            font-weight: bold;
+        }
+
+        .full-screen-track-record {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #f5f5f5;
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .track-record-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .episode-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .challenge-selector-compact {
+            display: flex;
+            gap: 10px;
+        }
+
+        .challenge-select, .variant-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            min-width: 150px;
+        }
+
+        .start-episode-button {
+            padding: 8px 20px;
+            font-size: 1.1em;
+        }
+
+        .cast-selection-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .tab-button.active {
+            background: #333;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .custom-cast-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .queen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .queen-option {
+            position: relative;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .queen-option img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .cast-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .add-queen-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .selected-queens {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .selected-queen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            min-height: 200px;
+        }
+
+        .start-custom-season-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .start-custom-season-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .queen-search-bar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>RuPaul's Drag Race Simulator</h1>
+    <div id="game-container" class="game-container">
+        <div id="queens-display" class="queens-sidebar"></div>
+        <div class="episode-content">
+            <div id="episode-display"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Add this at the top level of your code, with other global variables
+        let currentChallenge = null;
+
+        class Queen {
+            constructor(name, stats, image) {
+                this.name = name;
+                this.stats = stats;
+                this.image = image || "https://placehold.co/200x300";
+                this.trackRecord = [];
+                this.relationships = new Map();
+                this.storylines = [];
+                this.confessionals = [];
+                this.placement = 0;
+                this.totalScore = 0;
+                this.archetype = this.assignArchetype();
+                this.producerBoost = 0;
+                this.storylineDirection = "NEUTRAL";
+            }
+
+            assignArchetype() {
+                const archetypes = [
+                    "FRONTRUNNER",
+                    "DARK_HORSE",
+                    "EARLY_OUT",
+                    "MID_OUT",
+                    "VILLAIN",
+                    "FAN_FAVORITE"
+                ];
+                return archetypes[Math.floor(Math.random() * archetypes.length)];
+            }
+        }
+
+        const s11Cast = {
+    name: "Season 11",
+    description: "The queens of Season 11",
+    queens: [
+        new Queen("Yvie Oddly", {
+            acting: 8,          // Mixed performance in acting challenges
+            comedy: 7,          // Struggled in Snatch Game
+            dance: 12,         // Strong in performance challenges
+            design: 13,        // Consistently high in design challenges
+            impersonation: 6,  // Poor Snatch Game performance
+            runway: 14,        // Innovative and memorable runways
+            branding: 12,      // Strong personality throughout
+            charisma: 13,      // Fan favorite, unique perspective
+            performance: 14    // Strong lipsyncer, won the crown
+        }, "images/Yvie.webp"),
+
+        new Queen("Brooke Lynn Hytes", {
+            acting: 9,          // Decent in acting challenges
+            comedy: 6,          // Struggled in Snatch Game
+            dance: 15,         // Ballet background, excelled in dance
+            design: 14,        // Won design challenges, consistent
+            impersonation: 5,  // Poor Snatch Game performance
+            runway: 15,        // Consistently praised runway looks
+            branding: 10,      // Professional presence
+            charisma: 9,       // Sometimes came across as reserved
+            performance: 14    // Strong lipsyncer, finalist
+        }, "images/Brooke.webp"),
+
+        new Queen("Akeria C. Davenport", {
+            acting: 12,         // Strong in acting challenges
+            comedy: 10,         // Good in comedy moments
+            dance: 13,         // Won Draglympics
+            design: 11,        // Solid design skills
+            impersonation: 11, // Good Snatch Game
+            runway: 12,        // Strong runway presence
+            branding: 11,      // Good personality
+            charisma: 12,      // Natural charisma
+            performance: 12    // Strong performer
+        }, "images/Akeria.webp"),
+
+        new Queen("Silky Nutmeg Ganache", {
+            acting: 10,         // Good in acting challenges
+            comedy: 13,         // Won Snatch Game
+            dance: 8,          // Mixed performance in dance
+            design: 7,         // Struggled in design challenges
+            impersonation: 13, // Won Snatch Game
+            runway: 7,         // Often criticized runways
+            branding: 13,      // Strong personality
+            charisma: 12,      // Big personality
+            performance: 9     // Decent performer
+        }, "images/Silky.webp"),
+
+        new Queen("Nina West", {
+            acting: 13,         // Strong actor
+            comedy: 14,         // Excelled in comedy challenges
+            dance: 7,          // Struggled in dance challenges
+            design: 8,         // Mixed design challenge performance
+            impersonation: 12, // Strong Snatch Game
+            runway: 8,         // Sometimes basic runways
+            branding: 13,      // Strong branding
+            charisma: 15,      // Miss Congeniality
+            performance: 8     // Average performer
+        }, "images/Nina.webp"),
+
+        new Queen("Vanessa Vanjie Mateo", {
+            acting: 7,          // Struggled in acting
+            comedy: 9,          // Natural funny personality
+            dance: 10,         // Good performer
+            design: 8,         // Mixed design skills
+            impersonation: 6,  // Poor Snatch Game
+            runway: 8,         // Often criticized for same silhouette
+            branding: 13,      // Strong personality
+            charisma: 14,      // Very charismatic
+            performance: 11    // Good performer
+        }, "images/Vanessa.webp"),
+
+        new Queen("Plastique Tiara", {
+            acting: 8,          // Mixed acting performance
+            comedy: 7,          // Struggled in comedy
+            dance: 10,         // Good dancer
+            design: 13,        // Strong design skills
+            impersonation: 7,  // Average Snatch Game
+            runway: 13,        // Strong runway looks
+            branding: 9,       // Decent branding
+            charisma: 9,       // Sometimes reserved
+            performance: 10    // Good performer
+        }, "images/Plastique.webp"),
+
+        new Queen("Shuga Cain", {
+            acting: 9,          // Decent acting skills
+            comedy: 10,         // Good in comedy
+            dance: 8,          // Average dancer
+            design: 7,         // Struggled in design
+            impersonation: 11, // Good Snatch Game
+            runway: 9,         // Mixed runway looks
+            branding: 8,       // Average branding
+            charisma: 11,      // Likeable personality
+            performance: 8     // Average performer
+        }, "images/Shuga.webp"),
+
+        new Queen("Ra'jah O'Hara", {
+            acting: 7,          // Struggled in acting
+            comedy: 7,          // Mixed comedy performance
+            dance: 11,         // Strong dancer
+            design: 9,         // Good designer
+            impersonation: 7,  // Average Snatch Game
+            runway: 8,         // Mixed runway looks
+            branding: 7,       // Struggled with branding
+            charisma: 8,       // Sometimes confrontational
+            performance: 12    // Strong lipsyncer
+        }, "images/Rajah.webp"),
+
+        new Queen("Scarlet Envy", {
+            acting: 11,         // Won acting challenge
+            comedy: 9,          // Good comedy moments
+            dance: 6,          // Struggled with choreography
+            design: 10,        // Good design skills
+            impersonation: 8,  // Average Snatch Game
+            runway: 9,         // Good runway looks
+            branding: 10,      // Good branding
+            charisma: 10,      // Charming personality
+            performance: 7     // Struggled in lipsyncs
+        }, "images/Scarlet.webp"),
+
+        new Queen("Ariel Versace", {
+            acting: 7,          // Struggled in acting
+            comedy: 8,          // Average comedy
+            dance: 9,          // Good dancer
+            design: 7,         // Mixed design skills
+            impersonation: 7,  // Didn't make it to Snatch Game
+            runway: 8,         // Mixed runway looks
+            branding: 8,       // Average branding
+            charisma: 8,       // Sometimes one-note
+            performance: 7     // Average performer
+        }, "images/Ariel.webp"),
+
+        new Queen("Mercedes Iman Diamond", {
+            acting: 6,          // Struggled in acting
+            comedy: 6,          // Struggled in comedy
+            dance: 8,          // Decent dancer
+            design: 7,         // Average design skills
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 8,         // Some good runway looks
+            branding: 6,       // Struggled with branding
+            charisma: 8,       // Sweet personality
+            performance: 9     // Good performer
+        }, "images/Mercedes.webp"),
+
+        new Queen("Honey Davenport", {
+            acting: 7,          // Limited showing
+            comedy: 7,          // Limited showing
+            dance: 7,          // Limited showing
+            design: 8,         // Average design skills
+            impersonation: 6,  // Didn't make it to Snatch Game
+            runway: 8,         // Limited runway showing
+            branding: 7,       // Limited branding opportunity
+            charisma: 8,       // Pleasant personality
+            performance: 6     // Struggled in lipsync
+        }, "images/Honey.webp"),
+
+        new Queen("Kahanna Montrese", {
+            acting: 6,          // Struggled in acting
+            comedy: 6,          // Limited comedy showing
+            dance: 10,         // Strong dancer
+            design: 6,         // Struggled in design
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 7,         // Basic runway looks
+            branding: 6,       // Limited branding opportunity
+            charisma: 7,       // Some charismatic moments
+            performance: 10    // Strong lipsyncer
+        }, "images/Kahanna.webp"),
+
+        new Queen("Soju", {
+            acting: 5,          // Very limited showing
+            comedy: 6,          // Limited showing
+            dance: 5,          // Limited showing
+            design: 4,         // Struggled in first design challenge
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 5,         // Limited runway showing
+            branding: 7,       // Known personality pre-show
+            charisma: 7,       // Pleasant personality
+            performance: 4     // Struggled in first lipsync
+        }, "images/Soju.webp")
+    ]
+};
+
+const s7Cast = {
+    name: "Season 7",
+    description: "The queens of Season 7",
+    queens: [
+        new Queen("Violet Chachki", {
+            acting: 7,          // Struggled in acting challenges, especially ShakesQueer
+            comedy: 6,          // Weak in comedy challenges
+            dance: 12,         // Strong dancer, won Prancing Queens
+            design: 15,        // Won first design challenge, Hello Kitty Ball, consistent looks
+            impersonation: 7,  // Safe but unmemorable Alyssa Edwards
+            runway: 15,        // Consistently praised runway looks, fashion queen
+            branding: 11,      // Strong personal brand
+            charisma: 8,       // Sometimes came across cold
+            performance: 12    // Strong performer, winner
+        }, "images/Violet.webp"),
+
+        new Queen("Ginger Minj", {
+            acting: 14,         // Excelled in acting challenges
+            comedy: 14,         // Strong comedy skills, won Snatch Game
+            dance: 8,          // Struggled with dance challenges
+            design: 7,         // Bottom for design/sewing challenges
+            impersonation: 15, // Won Snatch Game as Adele
+            runway: 8,         // Often criticized for runway
+            branding: 12,      // Strong personality
+            charisma: 13,      // Very charismatic
+            performance: 11    // Good lipsyncer
+        }, "images/Ginger.webp"),
+
+        new Queen("Pearl", {
+            acting: 8,          // Improved throughout season
+            comedy: 9,          // Surprised in DESPY awards
+            dance: 7,          // Struggled with choreography
+            design: 11,        // Strong design skills
+            impersonation: 12, // Strong Big Ang in Snatch Game
+            runway: 13,        // Strong runway looks
+            branding: 12,      // Unique personality
+            charisma: 7,       // Often criticized for low energy
+            performance: 9     // Decent lipsyncer
+        }, "images/Pearl.webp"),
+
+        new Queen("Kennedy Davenport", {
+            acting: 11,         // Good in acting challenges
+            comedy: 13,         // Strong comedy skills, won Snatch Game
+            dance: 15,         // Excellence in dance challenges
+            design: 8,         // Average design skills
+            impersonation: 14, // Won Snatch Game as Little Richard
+            runway: 7,         // Often criticized for runway
+            branding: 9,       // Sometimes struggled with personality
+            charisma: 10,      // Strong presence
+            performance: 14    // Excellent lipsyncer
+        }, "images/Kennedy.webp"),
+
+        new Queen("Katya", {
+            acting: 12,         // Strong in acting challenges
+            comedy: 13,         // Excellent comedy skills
+            dance: 11,         // Good dancer, won Prancing Queens
+            design: 9,         // Decent design skills
+            impersonation: 12, // Strong Suze Orman in Snatch Game
+            runway: 10,        // Good runway presentations
+            branding: 14,      // Strong personality and branding
+            charisma: 15,      // Fan favorite, Miss Congeniality
+            performance: 13    // Strong performer
+        }, "images/Katya.webp"),
+
+        new Queen("Trixie Mattel", {
+            acting: 11,         // Good acting skills
+            comedy: 12,         // Strong comedy skills
+            dance: 8,          // Average dancer
+            design: 9,         // Decent design skills
+            impersonation: 7,  // Didn't make it to Snatch Game first time
+            runway: 10,        // Good runway looks
+            branding: 13,      // Strong personal brand
+            charisma: 12,      // Strong personality
+            performance: 8     // Struggled in lipsyncs
+        }, "images/Trixie.webp"),
+
+        new Queen("Miss Fame", {
+            acting: 7,          // Struggled in acting challenges
+            comedy: 6,          // Struggled with comedy
+            dance: 7,          // Average dancer
+            design: 12,        // Strong design and looks
+            impersonation: 5,  // Poor Donatella Versace
+            runway: 14,        // Excellence in runway looks
+            branding: 12,      // Strong brand
+            charisma: 9,       // Sometimes over-rehearsed
+            performance: 6     // Struggled in lipsyncs
+        }, "images/Fame.webp"),
+
+        new Queen("Max", {
+            acting: 12,         // Won ShakesQueer
+            comedy: 8,          // Mixed comedy performance
+            dance: 8,          // Average dancer
+            design: 10,        // Good design skills
+            impersonation: 4,  // Poor Sharon Needles
+            runway: 11,        // Strong runway concepts
+            branding: 11,      // Unique character
+            charisma: 10,      // Theatrical personality
+            performance: 7     // Limited lipsync ability
+        }, "images/Max.webp"),
+
+        new Queen("Jaidynn Diore Fierce", {
+            acting: 8,          // Mixed acting performance
+            comedy: 7,          // Struggled with comedy
+            dance: 10,         // Good dancer
+            design: 7,         // Struggled with design
+            impersonation: 5,  // Poor Raven-Symoné
+            runway: 7,         // Often basic runway looks
+            branding: 9,       // Likeable personality
+            charisma: 11,      // Very charismatic
+            performance: 10    // Good performer
+        }, "images/Jaidynn.webp"),
+
+        new Queen("Mrs. Kasha Davis", {
+            acting: 10,         // Good acting skills
+            comedy: 11,         // Strong comedy background
+            dance: 8,          // Average dancer
+            design: 8,         // Average design skills
+            impersonation: 8,  // Didn't make it to Snatch Game
+            runway: 8,         // Safe runway looks
+            branding: 10,      // Clear brand
+            charisma: 11,      // Strong personality
+            performance: 7     // Limited lipsync showing
+        }, "images/Kasha.webp"),
+
+        new Queen("Kandy Ho", {
+            acting: 7,          // Struggled in acting
+            comedy: 6,          // Weak in comedy
+            dance: 11,         // Strong dancer
+            design: 7,         // Average design skills
+            impersonation: 6,  // Didn't make it to Snatch Game
+            runway: 8,         // Mixed runway looks
+            branding: 7,       // Struggled with personality
+            charisma: 7,       // Limited charisma shown
+            performance: 12    // Strong lipsyncer
+        }, "images/Kandy.webp"),
+
+        new Queen("Jasmine Masters", {
+            acting: 6,          // Limited acting ability shown
+            comedy: 8,          // Natural comedic personality
+            dance: 9,          // Good dancer
+            design: 6,         // Struggled with design
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 6,         // Criticized runway looks
+            branding: 10,      // Strong personality
+            charisma: 11,      // Very charismatic
+            performance: 8     // Decent performer
+        }, "images/Jasmine.webp"),
+
+        new Queen("Sasha Belle", {
+            acting: 5,          // Struggled in acting challenge
+            comedy: 6,          // Limited comedy shown
+            dance: 6,          // Limited dance shown
+            design: 7,         // Average design skills
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 6,         // Basic runway looks
+            branding: 6,       // Unclear branding
+            charisma: 7,       // Limited charisma shown
+            performance: 6     // Limited performance ability
+        }, "images/Sasha.webp"),
+
+        new Queen("Tempest DuJour", {
+            acting: 7,          // Limited showing
+            comedy: 8,          // Natural comedy background
+            dance: 5,          // Limited dance ability
+            design: 5,         // Struggled first challenge
+            impersonation: 6,  // Didn't make it to Snatch Game
+            runway: 5,         // First episode only
+            branding: 8,       // Clear character
+            charisma: 9,       // Likeable personality
+            performance: 5     // Limited performance shown
+        }, "images/Tempest.webp")
+    ]
+};
+const lolCast = {
+    name: "League of Legends Queens",
+    description: "A fierce cast of queens inspired by League of Legends champions",
+    queens: [
+        new Queen("Le Blanc", {
+            acting: 10, comedy: 6, dance: 7, design: 8,
+            impersonation: 10, runway: 9, branding: 7, charisma: 8, performance: 8
+        }, "images/leblanc.png"), // Deceptive illusionist - excels at acting/impersonation
+        
+        new Queen("Cassiopeia", {
+            acting: 7, comedy: 4, dance: 3, design: 9, 
+            impersonation: 6, runway: 10, branding: 8, charisma: 7, performance: 5
+        }, "images/cassiopeia.png"), // Serpentine beauty - high fashion but limited mobility
+        
+        new Queen("Zoe", {
+            acting: 6, comedy: 10, dance: 9, design: 5,
+            impersonation: 7, runway: 6, branding: 8, charisma: 10, performance: 9
+        }, "images/zoe.png"), // Energetic trickster - great at comedy and performance
+        
+        new Queen("Gwen", {
+            acting: 5, comedy: 6, dance: 8, design: 10,
+            impersonation: 4, runway: 9, branding: 7, charisma: 7, performance: 7
+        }, "images/gwen.png"), // Seamstress - design and runway focused
+        
+        new Queen("Senna", {
+            acting: 8, comedy: 5, dance: 7, design: 8,
+            impersonation: 6, runway: 9, branding: 8, charisma: 9, performance: 8
+        }, "images/senna.png"), // Regal presence - well-rounded with strong runway
+        
+        new Queen("Gragas", {
+            acting: 6, comedy: 10, dance: 7, design: 4,
+            impersonation: 8, runway: 5, branding: 9, charisma: 10, performance: 8
+        }, "images/gragas.png"), // Camp queen - comedy and charisma focused
+        
+        new Queen("Ezreal", {
+            acting: 7, comedy: 8, dance: 9, design: 6,
+            impersonation: 7, runway: 7, branding: 10, charisma: 9, performance: 8
+        }, "images/ezreal.png"), // Pretty boy - strong at branding and performance
+        
+        new Queen("Taric", {
+            acting: 6, comedy: 7, dance: 7, design: 9,
+            impersonation: 6, runway: 10, branding: 8, charisma: 9, performance: 7
+        }, "images/taric.png"), // Glamorous knight - runway and design focused
+        
+        new Queen("Shyvana", {
+            acting: 8, comedy: 5, dance: 8, design: 7,
+            impersonation: 9, runway: 8, branding: 6, charisma: 7, performance: 9
+        }, "images/shyvana.png"), // Fierce dragon lady - strong performer
+        
+        new Queen("Samira", {
+            acting: 7, comedy: 6, dance: 10, design: 8,
+            impersonation: 7, runway: 9, branding: 8, charisma: 9, performance: 10
+        }, "images/samira.png"), // Style queen - dance and performance focused
+        
+        new Queen("Nami", {
+            acting: 8, comedy: 7, dance: 9, design: 7,
+            impersonation: 6, runway: 8, branding: 7, charisma: 10, performance: 8
+        }, "images/nami.png"), // Graceful support - charismatic performer
+        
+        new Queen("Lissandra", {
+            acting: 9, comedy: 4, dance: 6, design: 9,
+            impersonation: 8, runway: 10, branding: 7, charisma: 7, performance: 7
+        }, "images/lissandra.png"), // Ice queen - strong at acting and runway
+        
+        new Queen("Lulu", {
+            acting: 7, comedy: 9, dance: 8, design: 7,
+            impersonation: 8, runway: 6, branding: 8, charisma: 10, performance: 8
+        }, "images/lulu.png"), // Quirky fairy - comedy and charisma focused
+        
+        new Queen("Evelynn", {
+            acting: 9, comedy: 7, dance: 8, design: 8,
+            impersonation: 9, runway: 10, branding: 9, charisma: 10, performance: 9
+        }, "images/evelynn.png") // Seductive diva - strong all-rounder with high charisma
+    ]
+};
+
+
+const gemCast = {
+    name: "The Gem Girls",
+    description: "A dazzling cast of queens named after precious stones and cosmic elements", 
+    queens: [
+            new Queen("Victoria Sparkle", {
+                acting: 9, comedy: 10, dance: 4, design: 6,
+                impersonation: 9, runway: 7, branding: 8, charisma: 9, performance: 5
+            }, "images/VictoriaS.jpeg"),
+            new Queen("Luna Eclipse", {
+                acting: 4, comedy: 5, dance: 10, design: 9,
+                impersonation: 3, runway: 10, branding: 6, charisma: 7, performance: 10
+            }, "images/Luna.jpeg"),
+            new Queen("Jade Thunder", {
+                acting: 6, comedy: 9, dance: 7, design: 4,
+                impersonation: 8, runway: 5, branding: 10, charisma: 10, performance: 7
+            }, "images/Jade.jpeg"),
+            new Queen("Ruby Starlight", {
+                acting: 10, comedy: 4, dance: 6, design: 10,
+                impersonation: 5, runway: 9, branding: 7, charisma: 6, performance: 7
+            }, "images/Ruby.jpeg"),
+            new Queen("Sapphire Dream", {
+                acting: 5, comedy: 6, dance: 10, design: 7,
+                impersonation: 4, runway: 8, branding: 5, charisma: 9, performance: 10
+            }, "images/Sapphire.jpeg"),
+            new Queen("Crystal Storm", {
+                acting: 8, comedy: 5, dance: 4, design: 9,
+                impersonation: 10, runway: 8, branding: 6, charisma: 7, performance: 5
+            }, "images/Crystal.jpeg"),
+            new Queen("Emerald Rose", {
+                acting: 4, comedy: 10, dance: 6, design: 5,
+                impersonation: 9, runway: 7, branding: 10, charisma: 9, performance: 6
+            }, "images/Emerald.jpeg"),
+            new Queen("Diamond Dazzle", {
+                acting: 7, comedy: 5, dance: 8, design: 9,
+                impersonation: 4, runway: 10, branding: 6, charisma: 10, performance: 7
+            }, "images/Diamond.jpeg"),
+            new Queen("Pepper Heat", {
+                acting: 3, comedy: 10, dance: 7, design: 4,
+                impersonation: 9, runway: 5, branding: 10, charisma: 10, performance: 8
+            }, "images/Pepper.jpeg"),
+            new Queen("Victoria Eleganza", {
+                acting: 4, comedy: 3, dance: 5, design: 10,
+                impersonation: 3, runway: 10, branding: 6, charisma: 6, performance: 4
+            }, "images/VictoriaE.jpeg"),
+            new Queen("Diva Divine", {
+                acting: 7, comedy: 4, dance: 10, design: 8,
+                impersonation: 5, runway: 9, branding: 7, charisma: 10, performance: 10
+            }, "images/Diva.jpeg"),
+            new Queen("Rebel Hart", {
+                acting: 6, comedy: 8, dance: 10, design: 3,
+                impersonation: 4, runway: 5, branding: 7, charisma: 9, performance: 10
+            }, "images/Rebel.jpeg"),
+            new Queen("Mystique Shadow", {
+                acting: 8, comedy: 3, dance: 6, design: 10,
+                impersonation: 4, runway: 10, branding: 5, charisma: 5, performance: 6
+            }, "images/Mystique.jpeg"),
+            new Queen("Comedy Queen", {
+                acting: 9, comedy: 10, dance: 3, design: 2,
+                impersonation: 10, runway: 4, branding: 8, charisma: 10, performance: 6
+            }, "images/Comedy.jpeg"),
+            new Queen("Pageant Perfect", {
+                acting: 5, comedy: 3, dance: 8, design: 9,
+                impersonation: 4, runway: 10, branding: 6, charisma: 7, performance: 8
+            }, "images/Pageant.jpeg"),
+            new Queen("Alternative Edge", {
+                acting: 7, comedy: 8, dance: 4, design: 10,
+                impersonation: 6, runway: 9, branding: 10, charisma: 7, performance: 5
+            }, "images/Alternative.jpeg"),
+            new Queen("Dancing Diva", {
+                acting: 4, comedy: 5, dance: 10, design: 3,
+                impersonation: 6, runway: 7, branding: 5, charisma: 8, performance: 10
+            }, "images/dancing.jpeg")
+          ]
+        };
+        
+const s16Cast = {
+    name: "Season 16",
+    description: "The queens of Season 16",
+    queens: [
+        new Queen("Nymphia Wind", {
+            acting: 9, comedy: 8, dance: 11, design: 15,
+            impersonation: 8, runway: 15, branding: 11, charisma: 12, performance: 11
+        }, "images/Nymphia.webp"), // Winner - Excelled in design/runway (Ball, Neo-Goth), struggled in acting/comedy, improved in branding late game
+        
+        new Queen("Sapphira Cristál", {
+            acting: 11, comedy: 10, dance: 12, design: 11,
+            impersonation: 13, runway: 13, branding: 13, charisma: 15, performance: 15
+        }, "images/Sapphira.webp"), // Runner-up - Strong opera singer/performer, great Snatch Game, won corporate challenge, Miss Congeniality
+        
+        new Queen("Plane Jane", {
+            acting: 12, comedy: 13, dance: 10, design: 12,
+            impersonation: 14, runway: 12, branding: 11, charisma: 8, performance: 11
+        }, "images/Plane.webp"), // Top 3 - Won Snatch Game, strong comedy/acting, good design/makeover skills, lower charisma due to edit
+        
+        new Queen("Q", {
+            acting: 9, comedy: 9, dance: 8, design: 15,
+            impersonation: 10, runway: 14, branding: 10, charisma: 11, performance: 9
+        }, "images/Q.webp"), // 4th - Design/runway powerhouse (won doll & neo-goth), struggled in performance challenges
+        
+        new Queen("Morphine Love Dion", {
+            acting: 8, comedy: 11, dance: 14, design: 9,
+            impersonation: 9, runway: 11, branding: 10, charisma: 13, performance: 14
+        }, "images/Morphine.webp"), // 5th - Strong performer/dancer, won LaLaPaRuza, struggled in design challenges
+        
+        new Queen("Dawn", {
+            acting: 10, comedy: 9, dance: 8, design: 10,
+            impersonation: 11, runway: 10, branding: 9, charisma: 11, performance: 9
+        }, "images/Dawn.webp"), // 6th - Consistent but not outstanding, decent Snatch Game, struggled in final design challenge
+        
+        new Queen("Mhi'ya Iman Le'Paige", {
+            acting: 7, comedy: 8, dance: 15, design: 7,
+            impersonation: 10, runway: 8, branding: 7, charisma: 10, performance: 15
+        }, "images/Mhiya.webp"), // 7th - Lip sync assassin (survived 4 times), struggled in design/acting/branding
+        
+        new Queen("Plasma", {
+            acting: 13, comedy: 12, dance: 9, design: 7,
+            impersonation: 12, runway: 10, branding: 10, charisma: 11, performance: 10
+        }, "images/Plasma.webp"), // 8th - Won RDR Live & Rusical, strong actress/comedian, weaker in design
+        
+        new Queen("Xunami Muse", {
+            acting: 8, comedy: 9, dance: 12, design: 8,
+            impersonation: 7, runway: 11, branding: 10, charisma: 13, performance: 12
+        }, "images/Xunami.webp"), // 9th - Good performer, high charisma (co-Miss C), struggled with Snatch Game
+        
+        new Queen("Megami", {
+            acting: 7, comedy: 8, dance: 10, design: 9,
+            impersonation: 7, runway: 10, branding: 9, charisma: 11, performance: 10
+        }, "images/Megami.webp"), // 10th - Part of winning girl group, struggled in Rusical and most challenges
+        
+        new Queen("Mirage", {
+            acting: 7, comedy: 7, dance: 9, design: 8,
+            impersonation: 6, runway: 10, branding: 8, charisma: 9, performance: 10
+        }, "images/Mirage.webp"), // 11th - Early out, struggled in RDR Live comedy challenge
+        
+        new Queen("Geneva Karr", {
+            acting: 7, comedy: 8, dance: 11, design: 7,
+            impersonation: 6, runway: 9, branding: 8, charisma: 10, performance: 11
+        }, "images/Geneva.webp"), // 12th - Top 2 in premiere, part of winning girl group, struggled in design challenges
+        
+        new Queen("Hershii LiqCour-Jeté", {
+            acting: 6, comedy: 7, dance: 10, design: 6,
+            impersonation: 5, runway: 8, branding: 7, charisma: 9, performance: 10
+        }, "images/Hershii.webp"), // 13th - First out, showed dance potential but struggled in ball
+        
+        new Queen("Amanda Tori Meating", {
+            acting: 8, comedy: 10, dance: 7, design: 7,
+            impersonation: 6, runway: 8, branding: 9, charisma: 11, performance: 8
+        }, "images/Amanda.webp") // 14th - Early out, showed comedy potential but struggled in girl groups
+    ]
+};
+    const s12Cast = {
+    name: "Season 12",
+    description: "The queens of Season 12",
+    queens: [
+        new Queen("Jaida Essence Hall", {
+            acting: 11,         // Solid in acting challenges
+            comedy: 10,         // Good comedy moments, strong in debate
+            dance: 13,         // Strong performer
+            design: 14,        // Won design/makeover challenges
+            impersonation: 8,  // Safe as Cardi B in Snatch Game
+            runway: 15,        // Consistently excellent runway looks
+            branding: 12,      // Strong personality
+            charisma: 13,      // Very charismatic
+            performance: 14    // Strong lipsyncer, won the crown
+        }, "images/Jaida.webp"),
+
+        new Queen("Crystal Methyd", {
+            acting: 9,          // Improved throughout season
+            comedy: 12,         // Strong in later comedy challenges
+            dance: 11,         // Good performer
+            design: 12,        // Strong design skills
+            impersonation: 7,  // Struggled as Poppy in Snatch Game
+            runway: 13,        // Unique, creative runway looks
+            branding: 14,      // Very distinct brand
+            charisma: 13,      // Fan favorite
+            performance: 12    // Strong finale performance
+        }, "images/Crystal.webp"),
+
+        new Queen("Gigi Goode", {
+            acting: 13,         // Strong in acting challenges
+            comedy: 12,         // Good comedy skills
+            dance: 14,         // Excellence in performance challenges
+            design: 13,        // Won ball challenge
+            impersonation: 15, // Won Snatch Game as Maria the Robot
+            runway: 14,        // Consistently strong runway looks
+            branding: 12,      // Clear aesthetic
+            charisma: 11,      // Sometimes came across rehearsed
+            performance: 13    // Strong performer
+        }, "images/Gigi.webp"),
+
+        new Queen("Sherry Pie", {
+            acting: 13,         // Won multiple acting challenges
+            comedy: 13,         // Strong comedy skills
+            dance: 11,         // Good performer
+            design: 10,        // Solid design skills
+            impersonation: 13, // Strong Katherine Hepburn
+            runway: 9,         // Mixed runway looks
+            branding: 11,      // Clear character
+            charisma: 10,      // Mixed reception
+            performance: 10    // Decent performer
+        }, "images/Sherry.webp"),
+
+        new Queen("Jackie Cox", {
+            acting: 12,         // Strong in acting challenges
+            comedy: 13,         // Excelled in comedy
+            dance: 9,          // Average dancer
+            design: 8,         // Struggled with design
+            impersonation: 12, // Strong Lisa Rinna
+            runway: 9,         // Some runway struggles
+            branding: 12,      // Clear brand
+            charisma: 12,      // Very likeable
+            performance: 11    // Good lipsyncer
+        }, "images/Jackie.webp"),
+
+        new Queen("Heidi N Closet", {
+            acting: 10,         // Decent acting skills
+            comedy: 12,         // Natural comedic talent
+            dance: 11,         // Good performer
+            design: 7,         // Struggled with design
+            impersonation: 8,  // Safe Leslie Jones
+            runway: 7,         // Often criticized runways
+            branding: 13,      // Strong personality
+            charisma: 15,      // Miss Congeniality, very charismatic
+            performance: 13    // Strong lipsyncer
+        }, "images/Heidi.webp"),
+
+        new Queen("Widow Von'Du", {
+            acting: 9,          // Mixed acting performance
+            comedy: 11,         // Good comedy moments
+            dance: 13,         // Strong dancer
+            design: 9,         // Decent design skills
+            impersonation: 7,  // Struggled as Ike & Tina Turner
+            runway: 10,        // Good runway looks
+            branding: 11,      // Strong personality
+            charisma: 12,      // Very charismatic
+            performance: 14    // Excellent performer
+        }, "images/Widow.webp"),
+
+        new Queen("Jan", {
+            acting: 10,         // Good acting skills
+            comedy: 8,          // Struggled with comedy timing
+            dance: 12,         // Strong dancer/singer
+            design: 9,         // Good design skills
+            impersonation: 8,  // Safe Bernadette Peters
+            runway: 11,        // Strong runway looks
+            branding: 10,      // Sometimes over-eager
+            charisma: 10,      // Mixed reception
+            performance: 11    // Good performer
+        }, "images/Jan.webp"),
+
+        new Queen("Brita", {
+            acting: 8,          // Struggled in acting
+            comedy: 7,          // Struggled with comedy
+            dance: 9,          // Decent performer
+            design: 8,         // Average design skills
+            impersonation: 6,  // Poor Jennifer Holliday
+            runway: 8,         // Mixed runway looks
+            branding: 9,       // Strong personality but mixed reception
+            charisma: 8,       // Sometimes came across negative
+            performance: 10    // Good lipsyncer
+        }, "images/Brita.webp"),
+
+        new Queen("Aiden Zhane", {
+            acting: 7,          // Mixed acting performance
+            comedy: 6,          // Struggled with comedy
+            dance: 7,          // Limited dance skills
+            design: 7,         // Basic design skills
+            impersonation: 5,  // Poor Patricia Quinn
+            runway: 7,         // Limited runway looks
+            branding: 8,       // Unique but underdeveloped
+            charisma: 7,       // Quiet personality
+            performance: 6     // Struggled in lipsync
+        }, "images/Aiden.webp"),
+
+        new Queen("Nicky Doll", {
+            acting: 7,          // Struggled with acting
+            comedy: 6,          // Language barrier affected comedy
+            dance: 8,          // Decent dancer
+            design: 12,        // Strong design skills
+            impersonation: 6,  // Didn't make it to Snatch Game
+            runway: 13,        // Strong runway looks
+            branding: 9,       // Clear aesthetic
+            charisma: 8,       // Language barrier affected performance
+            performance: 7     // Struggled in lipsync
+        }, "images/Nicky.webp"),
+
+        new Queen("Rock M Sakura", {
+            acting: 8,          // Limited showing
+            comedy: 9,          // Natural comedic personality
+            dance: 8,          // Good performer
+            design: 7,         // Struggled in ball challenge
+            impersonation: 7,  // Didn't make it to Snatch Game
+            runway: 8,         // Mixed runway looks
+            branding: 10,      // Strong personality
+            charisma: 11,      // Very likeable
+            performance: 8     // Limited lipsync showing
+        }, "images/Rock.webp"),
+
+        new Queen("Dahlia Sin", {
+            acting: 6,          // Struggled in acting
+            comedy: 5,          // Struggled with comedy
+            dance: 7,          // Limited showing
+            design: 8,         // Decent design skills
+            impersonation: 5,  // Didn't make it to Snatch Game
+            runway: 9,         // Good runway looks
+            branding: 7,       // Limited development
+            charisma: 7,       // Limited showing
+            performance: 5     // Struggled in first lipsync
+        }, "images/Dahlia.webp")
+    ]
+};
+    // Store all casts in an array
+const allCasts = [gemCast, s12Cast, lolCast, s7Cast, s16Cast, s11Cast];
+
+        let currentSeason = {
+            queens: [],
+            currentEpisode: 0,
+            eliminatedQueens: [],
+            episodes: []
+        };
+
+        let episodePerformances = []; // Store performances globally for access
+        let topThreeSelected = false;
+
+        function startNewSeason() {
+            displayCastSelection();
+        }
+
+        function displayCastSelection() {
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            const castDiv = document.createElement('div');
+            castDiv.className = 'cast-selection';
+            
+            // Combine all queens from all casts into one array
+            const allAvailableQueens = allCasts.flatMap(cast => 
+                cast.queens.map(queen => ({...queen, originalCast: cast.name}))
+            );
+            
+            castDiv.innerHTML = `
+                <h2>Select Your Cast</h2>
+                <div class="season-options">
+                    <h3>Season Format</h3>
+                    <select id="season-format" style="margin-bottom: 15px; padding: 8px; width: 200px;">
+                        <option value="regular">Regular Season</option>
+                        <option value="all-stars">All Stars: Lip Sync For Your Legacy</option>
+                    </select>
+                    <div id="premiere-toggle">
+                        <label class="premiere-toggle">
+                            <input type="checkbox" id="split-premiere" checked>
+                            Split Premiere
+                            <span class="toggle-description">Start with two separate premiere episodes</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="cast-selection-tabs">
+                    <button class="tab-button active" onclick="switchTab(event, 'preset-casts')">Preset Casts</button>
+                    <button class="tab-button" onclick="switchTab(event, 'custom-cast')">Create Custom Cast</button>
+                </div>
+
+                <div id="preset-casts" class="tab-content active">
+                    <div class="cast-grid">
+                        ${allCasts.map(cast => `
+                            <div class="cast-card">
+                                <h3>${cast.name}</h3>
+                                <p>${cast.description}</p>
+                                <div class="cast-preview">
+                                    ${cast.queens.slice(0, 3).map(queen => `
+                                        <img src="${queen.image}" alt="${queen.name}" class="queen-mini-image">
+                                    `).join('')}
+                                    ${cast.queens.length > 3 ? `<span class="more-queens">+${cast.queens.length - 3} more</span>` : ''}
+                                </div>
+                                <button onclick="initializeSeason('${cast.name}')" class="cast-select-button">
+                                    Select Cast
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div id="custom-cast" class="tab-content">
+                    <div class="custom-cast-builder">
+                        <div class="queen-pool">
+                            <h3>Available Queens</h3>
+                            <input type="text" 
+                                id="queen-search" 
+                                placeholder="Search queens..." 
+                                class="queen-search-bar"
+                                oninput="filterQueens(this.value)">
+                            <div class="queen-grid">
+                                ${allAvailableQueens.map(queen => `
+                                    <div class="queen-option" data-queen='${JSON.stringify(queen).replace(/'/g, "&apos;")}'>
+                                        <img src="${queen.image}" alt="${queen.name}">
+                                        <p>${queen.name}</p>
+                                        <span class="cast-label">${queen.originalCast}</span>
+                                        <button onclick="addToCustomCast(this)" class="add-queen-button">+</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="selected-queens">
+                            <h3>Your Cast <span id="queen-count">(0/14)</span></h3>
+                            <div id="custom-cast-list" class="selected-queen-grid">
+                                <!-- Selected queens will be added here -->
+                            </div>
+                            <button onclick="startCustomSeason()" class="start-custom-season-button" disabled>
+                                Start Season with Custom Cast
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(castDiv);
+
+            // Add this CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                .cast-selection-tabs {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                }
+
+                .tab-button {
+                    padding: 10px 20px;
+                    border: none;
+                    background: #ddd;
+                    cursor: pointer;
+                    border-radius: 5px;
+                }
+
+                .tab-button.active {
+                    background: #333;
+                    color: white;
+                }
+
+                .tab-content {
+                    display: none;
+                }
+
+                .tab-content.active {
+                    display: block;
+                }
+
+                .custom-cast-builder {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin-top: 20px;
+                }
+
+                .queen-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 15px;
+                    max-height: 600px;
+                    overflow-y: auto;
+                }
+
+                .queen-option {
+                    position: relative;
+                    background: white;
+                    padding: 10px;
+                    border-radius: 8px;
+                    text-align: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+
+                .queen-option img {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+
+                .cast-label {
+                    font-size: 0.8em;
+                    color: #666;
+                }
+
+                .add-queen-button {
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    border: none;
+                    background: #4CAF50;
+                    color: white;
+                    cursor: pointer;
+                }
+
+                .selected-queens {
+                    background: #f5f5f5;
+                    padding: 20px;
+                    border-radius: 10px;
+                }
+
+                .selected-queen-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 15px;
+                    margin-top: 15px;
+                    min-height: 200px;
+                }
+
+                .start-custom-season-button {
+                    width: 100%;
+                    padding: 15px;
+                    margin-top: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+
+                .start-custom-season-button:disabled {
+                    background: #ccc;
+                    cursor: not-allowed;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function switchTab(event, tabId) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        let customCast = [];
+
+        function addToCustomCast(button) {
+            const queenData = JSON.parse(button.parentElement.dataset.queen);
+            
+            if (customCast.length >= 14) {
+                alert('Maximum cast size reached (14 queens)');
+                return;
+            }
+            
+            if (!customCast.find(queen => queen.name === queenData.name)) {
+                customCast.push(queenData);
+                updateCustomCastDisplay();
+            }
+        }
+
+        function removeFromCustomCast(queenName) {
+            customCast = customCast.filter(queen => queen.name !== queenName);
+            updateCustomCastDisplay();
+        }
+
+        function updateCustomCastDisplay() {
+            const customCastList = document.getElementById('custom-cast-list');
+            const queenCount = document.getElementById('queen-count');
+            const startButton = document.querySelector('.start-custom-season-button');
+            
+            queenCount.textContent = `(${customCast.length}/14)`;
+            startButton.disabled = customCast.length < 8;
+            
+            customCastList.innerHTML = customCast.map(queen => `
+                <div class="queen-option">
+                    <img src="${queen.image}" alt="${queen.name}">
+                    <p>${queen.name}</p>
+                    <span class="cast-label">${queen.originalCast}</span>
+                    <button onclick="removeFromCustomCast('${queen.name}')" class="add-queen-button" style="background: #f44336;">-</button>
+                </div>
+            `).join('');
+        }
+
+        function startCustomSeason() {
+            
+            if (customCast.length < 8) {
+                alert('Please select at least 8 queens');
+                return;
+            }
+            
+            // Get the season format and settings
+            const format = document.getElementById('season-format').value;
+            const splitPremiere = document.getElementById('split-premiere').checked;
+            
+            // Initialize the season with properly constructed Queen objects
+            currentSeason = {
+                queens: customCast.map(queen => {
+                    // Create new Queen instance with the same properties
+                    const newQueen = new Queen(queen.name, queen.stats, queen.image);
+                    newQueen.trackRecord = [];
+                    newQueen.relationships = new Map();
+                    newQueen.storylines = [];
+                    newQueen.confessionals = [];
+                    return newQueen;
+                }),
+                currentEpisode: 1,
+                eliminatedQueens: [],
+                episodes: [],
+                format: format,
+                splitPremiere: splitPremiere
+            };
+
+            // Reset custom cast array
+            customCast = [];
+            
+            // Update the display
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            // Start the season based on format
+            if (splitPremiere && currentSeason.queens.length >= 12) {
+                // Split the queens into two groups randomly
+                const shuffledQueens = [...currentSeason.queens].sort(() => Math.random() - 0.5);
+                currentSeason.group1 = shuffledQueens.slice(0, Math.floor(shuffledQueens.length / 2));
+                currentSeason.group2 = shuffledQueens.slice(Math.floor(shuffledQueens.length / 2));
+                startSplitPremiere();
+            } else {
+                startEpisode();
+            }
+            
+            // Update queens display
+            displayQueens();
+        }
+
+        function initializeSeason(castName) {
+            const selectedCast = allCasts.find(cast => cast.name === castName);
+            if (!selectedCast) return;
+            
+            const formatSelect = document.getElementById('season-format');
+            const isAllStars = formatSelect.value === 'all-stars';
+            const splitPremiereEnabled = !isAllStars && document.getElementById('split-premiere').checked;
+            
+            currentSeason = {
+                queens: [...selectedCast.queens],
+                currentEpisode: 0,
+                eliminatedQueens: [],
+                episodes: [],
+                splitPremiere: splitPremiereEnabled,
+                format: isAllStars ? 'all-stars' : 'regular'
+            };
+            
+            shuffleArray(currentSeason.queens);
+            // Remove the slice that limits to 10 queens for All Stars
+            if (!isAllStars) {
+                currentSeason.queens = currentSeason.queens.slice(0, 14);
+            }
+            
+            if (splitPremiereEnabled) {
+                const group1 = currentSeason.queens.slice(0, 7);
+                const group2 = currentSeason.queens.slice(7);
+                currentSeason.premiereGroups = { group1, group2 };
+            }
+            
+            displayQueens();
+            startNextEpisode();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createTrackRecordDisplay(queen) {
+            return queen.trackRecord.map((record, index) => {
+                let classes = `track-record ${record}`;
+                if (record === 'WIN' && queen.runnerUpWins && queen.runnerUpWins.includes(index)) {
+                    classes += ' runner-up';
+                }
+                return `<span class="${classes}">${record}</span>`;
+            }).join('');
+        }
+
+        // Use this in displayQueens
+        function displayQueens() {
+            const container = document.getElementById('queens-display');
+            container.innerHTML = '<h2>Cast</h2>';
+            
+            currentSeason.queens.forEach(queen => {
+                const queenCard = document.createElement('div');
+                queenCard.className = 'queen-card';
+                
+                queenCard.innerHTML = `
+                    <div class="queen-image-container">
+                        <img src="${queen.image}" alt="${queen.name}" class="queen-image">
+                    </div>
+                    <h3>${queen.name}</h3>
+                    <div class="track-record">
+                        ${createTrackRecordDisplay(queen)}
+                    </div>
+                    ${queen.scoreBreakdown ? `
+                        <div class="score-breakdown">
+                            <p>Base Score: ${queen.scoreBreakdown.baseScore}</p>
+                            <p>Random Factor: ${queen.scoreBreakdown.performanceVariance}</p>
+                            <p>Archetype Impact: ${queen.scoreBreakdown.storylineModifier}</p>
+                            <p>Producer Impact: ${queen.scoreBreakdown.producerModifier}</p>
+                            <p>Final Score: ${queen.scoreBreakdown.finalScore}</p>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(queenCard);
+            });
+
+            currentSeason.eliminatedQueens.slice().reverse().forEach(queen => {
+                const queenCard = document.createElement('div');
+                queenCard.className = 'queen-card eliminated';
+                queenCard.innerHTML = `
+                    <div class="queen-image-container">
+                        <img src="${queen.image}" alt="${queen.name}" class="queen-image">
+                    </div>
+                    <h3>${queen.name}</h3>
+                    <div class="track-record">
+                        ${createTrackRecordDisplay(queen)}
+                    </div>
+                `;
+                container.appendChild(queenCard);
+            });
+        }
+
+        function calculateChallengePerformance(queen, challenge) {
+            const challengeType = Object.values(challengeTypes).find(type => type.name === challenge);
+            if (!challengeType) return 5;
+            
+            // Calculate base score from relevant stats only
+            const baseScore = challengeType.stats.reduce((sum, stat) => {
+                return sum + (queen.stats[stat] || 0);
+            }, 0) / challengeType.stats.length;
+            
+            // Add performance variance (random factor)
+            const performanceVariance = (Math.random() * 4 - 2);
+            
+            // Add storyline impact
+            const storylineModifier = calculateStorylineModifier(queen);
+            
+            // Add archetype bonus/penalty
+            const archetypeModifier = calculateArchetypeModifier(queen, challenge);
+            
+            // Add producer influence
+            const producerModifier = queen.producerBoost || 0;
+            
+            // Add momentum factor
+            const momentumModifier = calculateMomentumModifier(queen);
+            
+            // Calculate final score
+            const finalScore = baseScore + performanceVariance + storylineModifier + 
+                              archetypeModifier + momentumModifier + producerModifier;
+            
+            // Store complete score breakdown with the exact values used
+            queen.scoreBreakdown = {
+                baseScore: baseScore,
+                performanceVariance: performanceVariance,
+                storylineModifier: storylineModifier,
+                archetypeModifier: archetypeModifier,
+                momentumModifier: momentumModifier,
+                producerModifier: producerModifier,
+                finalScore: finalScore,
+                timestamp: Date.now() // Add this to track when the score was calculated
+            };
+            
+            
+            return finalScore;
+        }
+
+        function calculateArchetypeModifier(queen, challenge) {
+            const archetypeBonus = {
+                FRONTRUNNER: {
+                    "Snatch Game": 1.5,
+                    "Ball Challenge": 1,
+                    "Rusical Challenge": 1
+                },
+                DARK_HORSE: {
+                    "Design Challenge": 2,
+                    "Acting Challenge": 1.5,
+                    "Commercial Challenge": 1
+                },
+                EARLY_OUT: {
+                    "Talent Show": -1,
+                    "Snatch Game": -1.5,
+                    "Ball Challenge": -1
+                },
+                MID_OUT: {
+                    "Improv Challenge": 0.5,
+                    "Commercial Challenge": 0.5,
+                    "Acting Challenge": 0.5
+                },
+                VILLAIN: {
+                    "Snatch Game": 1,
+                    "Commercial Challenge": 1.5,
+                    "Acting Challenge": 1
+                },
+                FAN_FAVORITE: {
+                    "Talent Show": 1.5,
+                    "Rusical Challenge": 1,
+                    "Makeover Challenge": 1.5
+                }
+            };
+            
+            return (archetypeBonus[queen.archetype]?.[challenge] || 0) * (Math.random() * 0.5 + 0.75);
+        }
+
+        function calculateMomentumModifier(queen) {
+            if (!queen.trackRecord || queen.trackRecord.length === 0) return 0;
+            
+            const recentPlacements = queen.trackRecord.slice(-3);
+            let momentum = 0;
+            
+            const placementValues = {
+                'WIN': 2,
+                'HIGH': 1,
+                'SAFE': 0,
+                'LOW': -1,
+                'BTM2': -2,
+                'ELIM': -3
+            };
+            
+            // Calculate momentum based on recent placements with decreasing weight
+            recentPlacements.forEach((placement, index) => {
+                const weight = (3 - index) / 3; // More recent placements have more weight
+                momentum += (placementValues[placement] || 0) * weight;
+            });
+            
+            // Add randomness to momentum
+            const momentumVariance = (Math.random() * 2 - 1) * Math.abs(momentum);
+            
+            return momentum * 0.5 + momentumVariance;
+        }
+
+        function calculateStorylineModifier(queen) {
+            const recentPlacements = queen.trackRecord.slice(-3);
+            let storylineModifier = 0;
+            
+            // Count recent high and low placements
+            const highPlacements = recentPlacements.filter(p => p === "WIN" || p === "HIGH").length;
+            const lowPlacements = recentPlacements.filter(p => p === "BTM2" || p === "LOW").length;
+            
+            // Underdog storyline
+            if (lowPlacements >= 2) {
+                storylineModifier += Math.random() * 3; // Bigger comeback potential
+            }
+            
+            // Frontrunner pressure
+            if (highPlacements >= 2) {
+                storylineModifier -= Math.random() * 2; // More pressure to maintain performance
+            }
+            
+            // Redemption arc
+            if (lowPlacements === 1 && highPlacements === 1) {
+                storylineModifier += Math.random() * 2; // Mixed track record creates interesting storylines
+            }
+            
+            // Add randomness based on queen's archetype
+            const archetypeRandomness = {
+                FRONTRUNNER: -1,
+                DARK_HORSE: 1.5,
+                EARLY_OUT: -0.5,
+                MID_OUT: 0,
+                VILLAIN: 0.5,
+                FAN_FAVORITE: 1
+            };
+            
+            storylineModifier += (archetypeRandomness[queen.archetype] || 0) * Math.random();
+            
+            return storylineModifier;
+        }
+
+        // Modify createQueenCard to show score breakdown
+        function createQueenCard(perf) {
+            const breakdown = perf.queen.scoreBreakdown;
+            if (!breakdown) {
+                console.warn(`No score breakdown for ${perf.queen.name} when creating card!`);
+                return `<div class="queen-performance">Error: No score data</div>`;
+            }
+            
+            return `
+                <div class="queen-performance">
+                    <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-performance-image">
+                    <div class="queen-performance-details">
+                        <h4>${perf.queen.name}</h4>
+                        <div class="score-details">
+                            <p>Base Score (Stats): ${breakdown.baseScore.toFixed(1)}</p>
+                            <p>Random Factor: ${breakdown.performanceVariance.toFixed(1)}</p>
+                            <p>Storyline Impact: ${breakdown.storylineModifier.toFixed(1)}</p>
+                            <p>Archetype Impact: ${breakdown.archetypeModifier.toFixed(1)}</p>
+                            <p>Momentum Impact: ${breakdown.momentumModifier.toFixed(1)}</p>
+                            <p>Producer Impact: ${breakdown.producerModifier.toFixed(1)}</p>
+                            <p><strong>Final Score: ${breakdown.finalScore.toFixed(1)}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function producerInfluence(queenName, direction) {
+            const queen = currentSeason.queens.find(q => q.name === queenName);
+            if (!queen) return;
+            
+            queen.storylineDirection = direction;
+            switch (direction) {
+                case "PUSHED":
+                    queen.producerBoost = 2.5;
+                    break;
+                case "SABOTAGED":
+                    queen.producerBoost = -2.5;
+                    break;
+                case "NEUTRAL":
+                    queen.producerBoost = 0;
+                    break;
+            }
+
+            // Recalculate current episode performances if we're in the middle of an episode
+            if (episodePerformances.length > 0) {
+                // Recalculate scores for all queens
+                episodePerformances.forEach(perf => {
+                    const currentChallenge = document.querySelector('.episode-container h3:first-of-type').textContent.replace('Challenge: ', '');
+                    perf.challengeScore = calculateChallengePerformance(perf.queen, currentChallenge);
+                });
+                
+                // Recalculate final scores and sort
+                calculateFinalScores();
+                
+                // Refresh the display
+                const currentChallenge = document.querySelector('.episode-container h3:first-of-type').textContent.replace('Challenge: ', '');
+                const currentRunway = document.querySelector('.episode-container h3:nth-of-type(2)').textContent.replace('Runway Theme: ', '');
+                displayTopThreeSelection(episodePerformances, currentChallenge, currentRunway);
+            }
+            
+            displayQueens();
+        }
+
+        const challengeTypes = {
+            TALENT_SHOW: {
+                name: "Talent Show",
+                description: "Queens showcase their unique talents",
+                variants: [
+                    "RuPaul's Talent Extravaganza",
+                    "Variety Show Spectacular",
+                    "Show Us What You Got",
+                    "Talent Show Eleganza"
+                ],
+                stats: ["performance"] // Pure performance challenge
+            },
+            DANCE: {
+                name: "Dance Challenge",
+                description: "Queens must showcase their dance skills",
+                variants: [
+                    "Dance Off",
+                    "Dance Battle",
+                    "Dance Showdown"
+                ],
+                stats: ["dance"] // Pure dance challenge
+            },
+            DESIGN: {
+                name: "Design Challenge",
+                description: "Queens must create outfits from scratch",
+                variants: [
+                    "Drag on a Dime",
+                    "Unconventional Materials",
+                    "Nature Queens",
+                    "Future of Drag"
+                ],
+                stats: ["design"] // Pure design challenge
+            },
+            
+            ACTING: {
+                name: "Acting Challenge",
+                description: "Queens must showcase their acting abilities",
+                variants: [
+                    "Gay's Anatomy",
+                    "RuPaul's Law & Order",
+                    "Drag Race Horror Story",
+                    "Sci-Fi Queens in Space"
+                ],
+                stats: ["acting"] // Pure acting challenge
+            },
+
+                        COMEDY: {
+                name: "Comedy Challenge",
+                description: "Queens must showcase their comedy skills",
+                variants: [
+                    "Comedy Showdown",
+                    "Laughing Matters",
+                    "Funny Business",
+                    "Comedy Central"
+                ],
+                stats: ["comedy"] // Pure comedy/improv challenge
+            },
+            
+            IMPROV: {
+                name: "Improv Challenge",
+                description: "Queens must think on their feet in improvised scenarios",
+                variants: [
+                    "Talk Show Drama",
+                    "Dating Game",
+                    "News Anchors Gone Wild",
+                    "Improv Comedy Show"
+                ],
+                stats: ["comedy"] // Pure comedy/improv challenge
+            },
+            
+            COMMERCIAL: {
+                name: "Commercial Challenge",
+                description: "Create and star in your own commercial",
+                variants: [
+                    "Drag Queen Product Launch",
+                    "PSA Parody",
+                    "Drag Queen Dating App",
+                    "Drag Queen Energy Drink"
+                ],
+                stats: ["branding", "charisma"] // Mix of branding and charisma
+            },
+            
+            SNATCH_GAME: {
+                name: "Snatch Game",
+                description: "The iconic celebrity impersonation challenge",
+                variants: [
+                    "Classic Snatch Game",
+                    "Snatch Game at Sea",
+                    "Snatch Game of Love",
+                    "Time Travel Snatch Game"
+                ],
+                stats: ["comedy", "impersonation"] // Mix of comedy and impersonation
+            },
+            
+            RUSICAL: {
+                name: "Rusical Challenge",
+                description: "A musical performance challenge",
+                variants: [
+                    "Social Media: The Rusical",
+                    "Madonna: The Unauthorized Rusical",
+                    "Drag Race Divas Live",
+                    "Political Campaign: The Rusical"
+                ],
+                stats: ["dance", "performance"] // Mix of dance and performance
+            },
+            
+            BALL: {
+                name: "Ball Challenge",
+                description: "Three runway looks including one made from scratch",
+                variants: [
+                    "The Drag Race Shopping Network Ball",
+                    "The Superheroes Ball",
+                    "The Four Seasons Ball",
+                    "The Zodiac Ball"
+                ],
+                stats: ["design", "runway"] // Mix of design and runway
+            },
+            
+            MAKEOVER: {
+                name: "Makeover Challenge",
+                description: "Transform guests into their drag family members",
+                variants: [
+                    "Drag Family Values",
+                    "Social Media Influencer Makeover",
+                    "Superfan Makeover",
+                    "Veterans Makeover"
+                ],
+                stats: ["design", "runway"] // Mix of design and runway presentation
+            },
+            
+            RUMIX: {
+                name: "RuMix Challenge",
+                description: "Write and perform verses for a RuPaul song",
+                variants: [
+                    "Read U Wrote U",
+                    "Category Is",
+                    "Kitty Girl",
+                    "Queens Everywhere"
+                ],
+                stats: ["dance", "performance", "charisma"] // Mix of performance skills
+            }
+        };
+
+        // Challenge order management
+        let usedChallenges = new Set();
+
+        function generateEpisodeChallenge(episodeNumber) {
+            // Reset used challenges if all have been used
+            if (usedChallenges.size >= Object.keys(challengeTypes).length - 2) { // -2 for SNATCH_GAME and BALL
+                usedChallenges.clear();
+            }
+            
+            // Specific episode challenges
+            if (episodeNumber === 1) {
+                usedChallenges.add('TALENT_SHOW');
+                return {
+                    ...challengeTypes.TALENT_SHOW,
+                    variant: challengeTypes.TALENT_SHOW.variants[Math.floor(Math.random() * challengeTypes.TALENT_SHOW.variants.length)]
+                };
+            }
+            
+            if (episodeNumber === 5) {
+                usedChallenges.add('SNATCH_GAME');
+                return {
+                    ...challengeTypes.SNATCH_GAME,
+                    variant: challengeTypes.SNATCH_GAME.variants[Math.floor(Math.random() * challengeTypes.SNATCH_GAME.variants.length)]
+                };
+            }
+            
+            if (episodeNumber === 8) {
+                usedChallenges.add('BALL');
+                return {
+                    ...challengeTypes.BALL,
+                    variant: challengeTypes.BALL.variants[Math.floor(Math.random() * challengeTypes.BALL.variants.length)]
+                };
+            }
+            
+            // Random challenge for other episodes
+            const availableChallenges = Object.entries(challengeTypes)
+                .filter(([key, challenge]) => 
+                    !usedChallenges.has(key) && 
+                    key !== 'SNATCH_GAME' && 
+                    key !== 'BALL'
+                );
+            
+            const [key, selectedChallenge] = availableChallenges[Math.floor(Math.random() * availableChallenges.length)];
+            usedChallenges.add(key);
+            
+            return {
+                ...selectedChallenge,
+                variant: selectedChallenge.variants[Math.floor(Math.random() * selectedChallenge.variants.length)]
+            };
+        }
+
+        function generateDrama() {
+            const dramaTypes = [
+                "ARGUMENT",
+                "FRIENDSHIP",
+                "RIVALRY",
+                "ALLIANCE",
+                "BREAKDOWN",
+                "REDEMPTION"
+            ];
+
+            const drama = {
+                type: dramaTypes[Math.floor(Math.random() * dramaTypes.length)],
+                queens: [],
+                description: ""
+            };
+
+            // Select 2-3 queens for the drama
+            const queensCount = Math.random() > 0.5 ? 2 : 3;
+            const availableQueens = [...currentSeason.queens];
+            shuffleArray(availableQueens);
+            drama.queens = availableQueens.slice(0, queensCount);
+
+            // Generate drama description
+            switch (drama.type) {
+                case "ARGUMENT":
+                    drama.description = `${drama.queens[0].name} and ${drama.queens[1].name} get into a heated argument during Untucked`;
+                    break;
+                case "FRIENDSHIP":
+                    drama.description = `${drama.queens[0].name} and ${drama.queens[1].name} form a close friendship`;
+                    break;
+                case "RIVALRY":
+                    drama.description = `A rivalry develops between ${drama.queens[0].name} and ${drama.queens[1].name}`;
+                    break;
+                // Add more drama descriptions...
+            }
+
+            return drama;
+        }
+
+        function startNextEpisode() {
+            currentSeason.currentEpisode++;
+            topThreeSelected = false;
+            
+            // Clear previous producer influences
+            currentSeason.queens.forEach(queen => {
+                queen.producerBoost = 0;
+                queen.storylineDirection = 'NEUTRAL';
+            });
+            
+            // Check for return challenge around mid-season
+            if (currentSeason.currentEpisode === Math.floor((currentSeason.queens.length + currentSeason.eliminatedQueens.length) / 2) && 
+                currentSeason.eliminatedQueens.length > 0 && 
+                currentSeason.queens.length >= 5) {
+                handleReturningQueen();
+                return;
+            }
+            
+            // Display producer influence selection before episode starts
+            displayProducerInfluenceSelection();
+        }
+
+        function displayProducerInfluenceSelection() {
+            const container = document.getElementById('episode-display');
+            
+            // Add finale format selection when reaching top 4
+            const showFinaleFormatSelector = currentSeason.queens.length === 4;
+            const showChallengeSelector = currentSeason.splitPremiere ? 
+                currentSeason.currentEpisode > 2 : 
+                currentSeason.currentEpisode > 1;
+            
+            container.innerHTML = `
+                <div class="episode-container">
+                    <h2>Episode ${currentSeason.currentEpisode} - Producer's Room</h2>
+                    
+                    ${showFinaleFormatSelector ? `
+                        <div class="season-options">
+                            <h3>Finale Format</h3>
+                            <label class="premiere-toggle">
+                                <input type="checkbox" id="top-four-finale" checked>
+                                Top 4 Finale
+                                <span class="toggle-description">Keep all 4 queens for the finale</span>
+                            </label>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="producer-controls">
+                        ${currentSeason.queens.map(queen => `
+                            <div class="queen-producer-card">
+                                <img src="${queen.image}" alt="${queen.name}" class="queen-image">
+                                <h3>${queen.name}</h3>
+                                <div class="track-record">
+                                    ${createTrackRecordDisplay(queen)}
+                                </div>
+                                <div class="producer-buttons">
+                                    <button onclick="setEpisodeInfluence('${queen.name.replace(/'/g, "\\'")}', 'PUSHED')" 
+                                        class="producer-button ${queen.storylineDirection === 'PUSHED' ? 'active' : ''}">
+                                        👑 Push
+                                    </button>
+                                    <button onclick="setEpisodeInfluence('${queen.name.replace(/'/g, "\\'")}', 'SABOTAGED')"
+                                        class="producer-button ${queen.storylineDirection === 'SABOTAGED' ? 'active' : ''}">
+                                        💀 Sabotage
+                                    </button>
+                                    <button onclick="setEpisodeInfluence('${queen.name.replace(/'/g, "\\'")}', 'NEUTRAL')"
+                                        class="producer-button ${queen.storylineDirection === 'NEUTRAL' ? 'active' : ''}">
+                                        ⚖️ Neutral
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="episode-navigation">
+                        ${showChallengeSelector ? `
+                            <div class="challenge-selector-compact">
+                                <select id="challenge-type" class="challenge-select">
+                                    ${Object.entries(challengeTypes).map(([key, challenge]) => `
+                                        <option value="${key}">${challenge.name}</option>
+                                    `).join('')}
+                                </select>
+                                <select id="challenge-variant" class="variant-select">
+                                    <!-- Will be populated based on challenge type -->
+                                </select>
+                            </div>
+                        ` : ''}
+                        <button onclick="startEpisode()" class="start-episode-button">Start Episode</button>
+                    </div>
+                </div>
+            `;
+
+            // Add this CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                .episode-navigation {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
+                    margin-top: 20px;
+                    padding: 15px;
+                    background: rgba(0,0,0,0.05);
+                    border-radius: 10px;
+                }
+
+                .challenge-selector-compact {
+                    display: flex;
+                    gap: 10px;
+                }
+
+                .challenge-select, .variant-select {
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    background: white;
+                    min-width: 150px;
+                }
+
+                .start-episode-button {
+                    padding: 8px 20px;
+                    font-size: 1.1em;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Only initialize challenge selectors if they exist
+            if (showChallengeSelector) {
+                const challengeSelect = document.getElementById('challenge-type');
+                const variantSelect = document.getElementById('challenge-variant');
+                
+                function updateVariants() {
+                    const selectedChallenge = challengeTypes[challengeSelect.value];
+                    variantSelect.innerHTML = selectedChallenge.variants.map(variant => 
+                        `<option value="${variant}">${variant}</option>`
+                    ).join('');
+                }
+                
+                challengeSelect.addEventListener('change', updateVariants);
+                updateVariants(); // Initial population
+            }
+        }
+
+        function setEpisodeInfluence(queenName, direction) {
+            const queen = currentSeason.queens.find(q => q.name === queenName);
+            if (!queen) return;
+            
+            queen.storylineDirection = direction;
+            switch (direction) {
+                case "PUSHED":
+                    queen.producerBoost = 3.5;
+                    break;
+                case "SABOTAGED":
+                    queen.producerBoost = -3.5;
+                    break;
+                case "NEUTRAL":
+                    queen.producerBoost = 0;
+                    break;
+            }
+            
+            // Refresh the producer selection display
+            displayProducerInfluenceSelection();
+        }
+
+        // First, define the base challenge handling function
+        function handleRegularChallenge(episodeChallenge, runwayTheme) {
+            console.log("=== HANDLE REGULAR CHALLENGE START ===");
+            console.log("Challenge type:", currentChallenge);
+            console.log("Episode challenge:", episodeChallenge);
+            
+            if (currentChallenge === "RUSICAL") {
+                console.log("Handling Rusical challenge");
+                handleRusicalChallenge(episodeChallenge);
+            } else if (currentChallenge === "GIRL_GROUP") {
+                console.log("Handling Girl Group challenge");
+                episodePerformances = currentSeason.queens.map(queen => {
+                    const result = evaluateGirlGroupPerformance(queen);
+                    console.log(`Girl Group result for ${queen.name}:`, result);
+                    
+                    return {
+                        queen: queen,
+                        challengeScore: result.score,
+                        runwayScore: queen.stats.runway + (Math.random() * 2 - 1),
+                        totalScore: 0,
+                        performance: result.performance,
+                        critiques: result.critiques,
+                        vocals: result.vocals,
+                        choreography: result.choreography,
+                        presence: result.presence,
+                        verse: result.verse
+                    };
+                });
+                
+                console.log("Final episodePerformances:", episodePerformances);
+            } else {
+                console.log("Handling default challenge");
+                episodePerformances = currentSeason.queens.map(queen => ({
+                    queen: queen,
+                    challengeScore: calculateChallengePerformance(queen, episodeChallenge.name),
+                    runwayScore: queen.stats.runway + (Math.random() * 2 - 1),
+                    totalScore: 0
+                }));
+            }
+
+            calculateFinalScores();
+            console.log("=== HANDLE REGULAR CHALLENGE END ===");
+            displayTopThreeSelection(episodePerformances, episodeChallenge, runwayTheme);
+        }
+
+        function handleRusicalChallenge(episodeChallenge) {
+            console.log("=== HANDLE RUSICAL CHALLENGE START ===");
+            console.log("Episode challenge:", episodeChallenge);
+
+            const selectedTheme = rusicalChallenges.themes.find(theme => 
+                theme.name === episodeChallenge.variant
+            ) || rusicalChallenges.themes[0];
+            
+            console.log("Selected Rusical theme:", selectedTheme);
+
+            const availableRoles = [...rusicalChallenges.roles];
+            shuffleArray(availableRoles);
+            
+            episodePerformances = currentSeason.queens.map((queen, index) => {
+                const role = availableRoles[index % availableRoles.length];
+                
+                console.log(`Assigning role to ${queen.name}:`, role);
+
+                const vocals = (queen.stats.performance * 0.7 + Math.random() * 3);
+                const acting = (queen.stats.acting * 0.7 + Math.random() * 3);
+                const choreography = (queen.stats.dance * 0.7 + Math.random() * 3);
+                const characterization = ((queen.stats.acting + queen.stats.performance) * 0.35 + Math.random() * 3);
+                
+                const performance = {
+                    vocals: Math.min(10, vocals),
+                    acting: Math.min(10, acting),
+                    choreography: Math.min(10, choreography),
+                    characterization: Math.min(10, characterization),
+                    role: role
+                };
+                
+                console.log(`Performance for ${queen.name}:`, performance);
+
+                const challengeScore = (vocals + acting + choreography + characterization) / 4;
+                
+                return {
+                    queen: queen,
+                    challengeScore: challengeScore,
+                    runwayScore: queen.stats.runway + (Math.random() * 2 - 1),
+                    totalScore: 0,
+                    performance: performance
+                };
+            });
+
+            console.log("Final episodePerformances for Rusical:", episodePerformances);
+            console.log("=== HANDLE RUSICAL CHALLENGE END ===");
+        }
+
+        function generateDetailedCritiques(performance) {
+            const critiques = [];
+            
+            // Vocal critiques
+            if (performance.vocals >= 9) {
+                critiques.push("Your vocals were absolutely stunning, hitting every note perfectly!");
+            } else if (performance.vocals >= 7) {
+                critiques.push("Your vocals were strong and confident.");
+            } else if (performance.vocals >= 5) {
+                critiques.push("The vocals were a bit shaky at times, but you pushed through.");
+            } else {
+                critiques.push("You really struggled with the vocals tonight.");
+            }
+            
+            // Choreography critiques
+            if (performance.choreography >= 9) {
+                critiques.push(`Your ${performance.danceStyle} moves were executed flawlessly - a true professional!`);
+            } else if (performance.choreography >= 7) {
+                critiques.push(`You handled the ${performance.danceStyle} choreography well.`);
+            } else if (performance.choreography >= 5) {
+                critiques.push(`The ${performance.danceStyle} choreography needed more precision.`);
+            } else {
+                critiques.push(`You were consistently behind the beat and struggled with the ${performance.danceStyle} moves.`);
+            }
+            
+            // Stage presence critiques
+            if (performance.presence >= 9) {
+                critiques.push("Your stage presence was magnetic - you commanded attention!");
+            } else if (performance.presence >= 7) {
+                critiques.push("You had great energy and connected with the audience.");
+            } else if (performance.presence >= 5) {
+                critiques.push("Your stage presence was inconsistent - sometimes you disappeared into the background.");
+            } else {
+                critiques.push("You seemed uncomfortable and lost on stage.");
+            }
+            
+            return critiques;
+        }
+
+        function displayGirlGroupContent(performances) {
+            console.log("=== DISPLAY GIRL GROUP CONTENT START ===");
+            console.log("Received performances:", performances);
+            
+            // Group the performances
+            const groups = {};
+            performances.forEach(perf => {
+                console.log("Processing performance for:", perf.queen.name);
+                console.log("Performance data:", {
+                    vocals: perf.vocals,
+                    choreography: perf.choreography,
+                    presence: perf.presence,
+                    verse: perf.verse
+                });
+                
+                if (!groups[perf.group]) {
+                    groups[perf.group] = [];
+                }
+                groups[perf.group].push(perf);
+            });
+            
+            console.log("Grouped performances:", groups);
+            console.log("=== DISPLAY GIRL GROUP CONTENT END ===");
+            
+            return `
+                <div class="girl-group-content">
+                    ${Object.entries(groups).map(([groupName, groupPerfs]) => `
+                        <div class="group-section">
+                            <h3>${groupName}</h3>
+                            <div class="group-members">
+                                ${groupPerfs.map(perf => `
+                                    <div class="member-icon">
+                                        <img src="${perf.queen.image}" alt="${perf.queen.name}" title="${perf.queen.name}">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="group-hook">
+                                <h4>Group Hook:</h4>
+                                <p class="hook-lyrics">${girlGroupChallenge.hooks[Math.floor(Math.random() * girlGroupChallenge.hooks.length)]}</p>
+                            </div>
+                            <div class="performances">
+                                ${groupPerfs.map(perf => `
+                                    <div class="queen-performance">
+                                        <h4>${perf.queen.name}'s Performance</h4>
+                                        <div class="verse-section">
+                                            <p class="verse-title">Verse:</p>
+                                            <p class="verse-lyrics">${perf.verse}</p>
+                                        </div>
+                                        <div class="performance-scores">
+                                            <p class="score ${perf.vocals >= 7 ? 'high-score' : perf.vocals >= 5 ? 'mid-score' : 'low-score'}">
+                                                Vocals: ${perf.vocals ? perf.vocals.toFixed(1) : 'N/A'}/10
+                                            </p>
+                                            <p class="score ${perf.choreography >= 7 ? 'high-score' : perf.choreography >= 5 ? 'mid-score' : 'low-score'}">
+                                                Choreography: ${perf.choreography ? perf.choreography.toFixed(1) : 'N/A'}/10
+                                            </p>
+                                            <p class="score ${perf.presence >= 7 ? 'high-score' : perf.presence >= 5 ? 'mid-score' : 'low-score'}">
+                                                Stage Presence: ${perf.presence ? perf.presence.toFixed(1) : 'N/A'}/10
+                                            </p>
+                                        </div>
+                                        <div class="critiques">
+                                            ${perf.critiques.map(critique => `<p>• ${critique}</p>`).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <style>
+                    .girl-group-content {
+                        margin: 20px 0;
+                        padding: 15px;
+                        background: #f8f8f8;
+                        border-radius: 10px;
+                    }
+                    .group-section {
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background: #fff;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    }
+                    .group-members {
+                        display: flex;
+                        gap: 10px;
+                        margin: 10px 0;
+                    }
+                    .member-icon img {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 25px;
+                        object-fit: cover;
+                        border: 2px solid #9c27b0;
+                    }
+                    .hook-lyrics {
+                        font-style: italic;
+                        color: #9c27b0;
+                        margin: 10px 0;
+                        padding: 10px;
+                        background: #f8f8f8;
+                        border-radius: 5px;
+                    }
+                    .verse-section {
+                        margin: 10px 0;
+                        padding: 10px;
+                        background: #f8f8f8;
+                        border-radius: 5px;
+                    }
+                    .performance-scores {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 10px;
+                        margin: 10px 0;
+                    }
+                    .score {
+                        padding: 5px;
+                        border-radius: 5px;
+                        text-align: center;
+                    }
+                    .high-score { background: #c8e6c9; color: #2e7d32; }
+                    .mid-score { background: #fff3e0; color: #f57c00; }
+                    .low-score { background: #ffcdd2; color: #c62828; }
+                    .critiques {
+                        margin-top: 10px;
+                        border-top: 1px solid #ddd;
+                        padding-top: 10px;
+                    }
+                </style>
+            `;
+        }
+
+        // Then define the episode handling functions
+        function handleRegularEpisode(challengeSelect, variantSelect) {
+            console.log("Starting regular episode");
+            const selectedChallengeType = challengeSelect.value;
+            const selectedVariant = variantSelect.value;
+            
+            console.log("Selected challenge:", selectedChallengeType);
+            console.log("Selected variant:", selectedVariant);
+            
+            const episodeChallenge = {
+                ...challengeTypes[selectedChallengeType],
+                variant: selectedVariant
+            };
+            
+            // Set current challenge type globally
+            currentChallenge = selectedChallengeType;
+            console.log("Set currentChallenge to:", currentChallenge);
+            
+            const randomCategory = runwayThemes.CATEGORIES[Math.floor(Math.random() * runwayThemes.CATEGORIES.length)];
+            const runwayTheme = randomCategory.variants[Math.floor(Math.random() * randomCategory.variants.length)];
+            
+            handleRegularChallenge(episodeChallenge, runwayTheme);
+        }
+
+        function handlePremiereEpisode(queens, groupName) {
+            const premiereChallenge = {
+                name: "Design Challenge",
+                variant: "First Impressions",
+                description: "Create a stunning look that shows who you are as a drag queen"
+            };
+            const runwayTheme = runwayThemes.SIGNATURE.name;
+            
+            episodePerformances = queens.map(queen => ({
+                queen: queen,
+                challengeScore: calculateChallengePerformance(queen, premiereChallenge.name),
+                runwayScore: queen.stats.runway + (Math.random() * 2 - 1),
+                totalScore: 0
+            }));
+            
+            calculateFinalScores();
+            
+            if (currentSeason.splitPremiere) {
+                displayPremiereTopTwo(episodePerformances, premiereChallenge, runwayTheme, groupName);
+            } else {
+                displayTopThreeSelection(episodePerformances, premiereChallenge, runwayTheme);
+            }
+        }
+
+        // Finally, define the episode start function
+        function startEpisode() {
+            const challengeSelect = document.getElementById('challenge-type');
+            const variantSelect = document.getElementById('challenge-variant');
+            
+            // Check for finale conditions first
+            if (currentSeason.queens.length === 4) {
+                const topFourFinale = document.getElementById('top-four-finale')?.checked;
+                if (topFourFinale) {
+                    displayFinale();
+                    return;
+                }
+            } else if (currentSeason.queens.length === 3) {
+                displayFinale();
+                return;
+            }
+            
+            // Set current challenge for premiere episodes
+            if (currentSeason.splitPremiere) {
+                if (currentSeason.currentEpisode === 1) {
+                    currentChallenge = "DESIGN";
+                    handlePremiereEpisode(currentSeason.premiereGroups.group1, "Group 1");
+                } else if (currentSeason.currentEpisode === 2) {
+                    currentChallenge = "DESIGN";
+                    handlePremiereEpisode(currentSeason.premiereGroups.group2, "Group 2");
+                } else {
+                    currentChallenge = challengeSelect.value;
+                    handleRegularEpisode(challengeSelect, variantSelect);
+                }
+            } else {
+                if (currentSeason.currentEpisode === 1) {
+                    currentChallenge = "DESIGN";
+                    handlePremiereEpisode(currentSeason.queens, "Premiere");
+                } else {
+                    currentChallenge = challengeSelect.value;
+                    handleRegularEpisode(challengeSelect, variantSelect);
+                }
+            }
+            
+            console.log("Current challenge set to:", currentChallenge);
+        }
+
+        function displayPremiereTopTwo(performances, challenge, runwayTheme, groupName) {
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            const episodeDiv = document.createElement('div');
+            episodeDiv.className = 'episode-container';
+            
+            const topTwo = performances.slice(0, 2);
+            
+            episodeDiv.innerHTML = `
+                <h2>Episode ${currentSeason.currentEpisode} - ${groupName} Premiere</h2>
+                <div class="challenge-info">
+                    <h3>${challenge.name}</h3>
+                    <p>${challenge.description}</p>
+                    <h3>Runway Theme: ${runwayTheme}</h3>
+                </div>
+                <div class="top-three-selection">
+                    <h4>Select the Winner of the Lip Sync:</h4>
+                    ${topTwo.map(perf => `
+                        <button onclick="selectPremiereWinner('${perf.queen.name.replace(/'/g, "\\'")}')" class="winner-select-button">
+                            <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-image">
+                            <br>
+                            ${perf.queen.name} (Score: ${perf.totalScore.toFixed(1)})
+                            <br>
+                            Track Record: ${createTrackRecordDisplay(perf.queen)}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.appendChild(episodeDiv);
+        }
+
+        function selectPremiereWinner(queenName) {
+            if (topThreeSelected) return;
+            
+            topThreeSelected = true;
+            const winnerIndex = episodePerformances.findIndex(p => p.queen.name === queenName);
+            const runnerUpIndex = winnerIndex === 0 ? 1 : 0;
+            
+            // Assign placements for premiere episode
+            episodePerformances[winnerIndex].placement = "WIN";
+            episodePerformances[runnerUpIndex].placement = "TOP2";
+            episodePerformances[2].placement = "HIGH";
+            episodePerformances[3].placement = "HIGH";
+            for (let i = 4; i < episodePerformances.length; i++) {
+                episodePerformances[i].placement = "SAFE";
+            }
+            
+            // Update track records
+            episodePerformances.forEach(perf => {
+                perf.queen.trackRecord.push(perf.placement);
+            });
+            
+            const currentChallenge = document.querySelector('.episode-container h3:first-of-type').textContent.replace('Challenge: ', '');
+            const currentRunway = document.querySelector('.episode-container h3:nth-of-type(2)').textContent.replace('Runway Theme: ', '');
+            
+            displayEpisodeResults(episodePerformances, currentChallenge, currentRunway, generateDrama());
+
+            // Add delay before starting next episode
+            setTimeout(() => {
+                startNextEpisode();
+            }, 1000);
+        }
+
+        function calculateFinalScores() {
+            episodePerformances.forEach(perf => {
+                // Use the stored score breakdown instead of recalculating
+                if (perf.queen.scoreBreakdown) {
+                    perf.totalScore = perf.queen.scoreBreakdown.finalScore;
+                } else {
+                    console.warn(`No score breakdown found for ${perf.queen.name}!`);
+                }
+            });
+            
+            // Sort by total score
+            episodePerformances.sort((a, b) => b.totalScore - a.totalScore);
+        }
+
+        function displayTopThreeSelection(performances, challenge, runwayTheme) {
+            console.log("Displaying top three selection with challenge:", challenge);
+            console.log("Current challenge type:", currentChallenge);
+            
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            const episodeDiv = document.createElement('div');
+            episodeDiv.className = 'episode-container';
+            
+            let challengeContent = '';
+            if (currentChallenge === "GIRL_GROUP") {
+                challengeContent = displayGirlGroupContent(performances);
+            } else if (currentChallenge === "RUSICAL") {
+                challengeContent = `
+                    <div class="rusical-performances">
+                        <h3>Rusical Performances</h3>
+                        ${performances.map(perf => `
+                            <div class="queen-performance">
+                                <h4>${perf.queen.name}</h4>
+                                <p>Role: ${perf.performance.role.name}</p>
+                                <div class="performance-scores">
+                                    <p>Vocals: ${perf.performance.vocals.toFixed(1)}/10</p>
+                                    <p>Acting: ${perf.performance.acting.toFixed(1)}/10</p>
+                                    <p>Choreography: ${perf.performance.choreography.toFixed(1)}/10</p>
+                                    <p>Characterization: ${perf.performance.characterization.toFixed(1)}/10</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <style>
+                        .rusical-performances {
+                            margin: 20px 0;
+                            padding: 15px;
+                            background: #f8f8f8;
+                            border-radius: 10px;
+                        }
+                        .performance-scores {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 10px;
+                            margin: 10px 0;
+                        }
+                        .performance-scores p {
+                            margin: 0;
+                            padding: 5px;
+                            background: #fff;
+                            border-radius: 5px;
+                            text-align: center;
+                        }
+                    </style>
+                `;
+            }
+
+            episodeDiv.innerHTML = `
+                <h2>Episode ${currentSeason.currentEpisode}</h2>
+                <div class="challenge-info">
+                    <h3>${challenge.name}: ${challenge.variant}</h3>
+                    <h3>Runway Theme: ${runwayTheme}</h3>
+                </div>
+                ${challengeContent}
+                <div class="top-three-selection">
+                    <h4>Select the Winner from Top 3 Scoring Queens:</h4>
+                    ${performances.slice(0, 3).map((perf, index) => `
+                        <button onclick="selectWinner('${perf.queen.name.replace(/'/g, "\\'")}')" class="winner-select-button">
+                            <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-image">
+                            <br>
+                            #${index + 1}: ${perf.queen.name} (Score: ${perf.totalScore.toFixed(1)})
+                            <br>
+                            Track Record: ${createTrackRecordDisplay(perf.queen)}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.appendChild(episodeDiv);
+        }
+
+        function selectWinner(queenName, isDoubleWin = false) {
+            if (topThreeSelected) return;
+            
+            episodePerformances.forEach((p, i) => {
+            });
+            
+            topThreeSelected = true;
+            
+            // Sort performances by total score before assigning placements
+            episodePerformances.sort((a, b) => b.totalScore - a.totalScore);
+            
+            episodePerformances.forEach((p, i) => {
+            });
+
+            if (isDoubleWin) {
+                episodePerformances[0].placement = "WIN";
+                episodePerformances[1].placement = "WIN";
+                episodePerformances[2].placement = "HIGH";
+            } else {
+                const winner = episodePerformances.find(p => p.queen.name === queenName);
+                const winnerIndex = episodePerformances.findIndex(p => p.queen.name === queenName);
+                
+                
+                if (winner !== episodePerformances[0]) {
+                    if (winnerIndex <= 2) {
+                        winner.placement = "WIN";
+                        episodePerformances[0].placement = "HIGH";
+                        episodePerformances[winnerIndex === 1 ? 2 : 1].placement = "HIGH";
+                    } else {
+                        episodePerformances[0].placement = "WIN";
+                        episodePerformances[1].placement = "HIGH";
+                        episodePerformances[2].placement = "HIGH";
+                    }
+                } else {
+                    episodePerformances[0].placement = "WIN";
+                    episodePerformances[1].placement = "HIGH";
+                    episodePerformances[2].placement = "HIGH";
+                }
+            }
+            
+            // Assign remaining placements
+            const remainingQueens = episodePerformances.length - 3;
+            const safeCount = Math.max(0, remainingQueens - 3);
+            
+            
+            // Assign SAFE placements
+            for (let i = 3; i < 3 + safeCount; i++) {
+                episodePerformances[i].placement = "SAFE";
+            }
+            
+            // Assign bottom placements
+            if (episodePerformances.length > 5) {
+                episodePerformances[episodePerformances.length - 3].placement = "LOW";
+                episodePerformances[episodePerformances.length - 2].placement = "BTM2";
+                episodePerformances[episodePerformances.length - 1].placement = "BTM2";
+            } else {
+                episodePerformances[episodePerformances.length - 2].placement = "BTM2";
+                episodePerformances[episodePerformances.length - 1].placement = "BTM2";
+            }
+            
+            episodePerformances.forEach(p => {
+            });
+            
+            // Update track records
+            episodePerformances.forEach(perf => {
+                perf.queen.trackRecord.push(perf.placement);
+            });
+            
+            const currentChallenge = document.querySelector('.episode-container h3:first-of-type').textContent;
+            const currentRunway = document.querySelector('.episode-container h3:nth-of-type(2)').textContent.replace('Runway Theme: ', '');
+            
+            displayEpisodeResults(episodePerformances, currentChallenge, currentRunway, generateDrama());
+        }
+
+        function handleSnatchGame(performances) {
+            performances.forEach(perf => {
+                const snatchGameCharacters = [
+                    "Marilyn Monroe", "Lady Gaga", "Beyoncé", "Madonna",
+                    "Cher", "Britney Spears", "Joan Crawford", "Mae West"
+                ];
+                perf.snatchGameCharacter = snatchGameCharacters[Math.floor(Math.random() * snatchGameCharacters.length)];
+                
+                // Add character-specific bonus/penalty
+                const characterBonus = Math.random() * 2 - 1;
+                perf.challengeScore += characterBonus;
+            });
+        }
+
+        function handleBallChallenge(performances) {
+            const ballCategories = [
+                "Executive Realness",
+                "Weather Goddess",
+                "Final Eleganza Extravaganza"
+            ];
+            
+            performances.forEach(perf => {
+                perf.ballLooks = ballCategories.map(category => ({
+                    category: category,
+                    score: (perf.queen.stats.design * 0.7 + perf.queen.stats.runway * 0.3) + (Math.random() * 2 - 1)
+                }));
+                
+                // Average of all three looks
+                const ballScore = perf.ballLooks.reduce((sum, look) => sum + look.score, 0) / 3;
+                perf.challengeScore = ballScore;
+            });
+        }
+
+function assignPlacements(performances, isAllStars = false) {
+    const count = performances.length;
+    
+    // Winner
+    performances[0].placement = "WIN";
+    
+    // Different placement distributions based on number of queens
+    if (count > 5) {
+        // Regular episode (6+ queens)
+        performances[1].placement = "HIGH";
+        performances[2].placement = "HIGH";
+        
+        // Safe placements
+        for (let i = 3; i < count - 3; i++) {
+            performances[i].placement = "SAFE";
+        }
+        
+        performances[count - 3].placement = "LOW";
+        performances[count - 2].placement = "BTM2";
+        performances[count - 1].placement = "BTM2";
+    } else if (count === 5) {
+        // 5 queens
+        performances[1].placement = "HIGH";
+        performances[2].placement = "HIGH";
+        performances[3].placement = "BTM2";
+        performances[4].placement = "BTM2";
+    } else if (count === 4) {
+        // 4 queens
+        performances[1].placement = "HIGH";
+        performances[2].placement = "BTM2";
+        performances[3].placement = "BTM2";
+    }
+
+    // Update track records
+    performances.forEach(perf => {
+        perf.queen.trackRecord.push(perf.placement);
+    });
+}
+
+        function displayEpisodeResults(performances, challenge, runwayTheme, drama) {
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            const episodeDiv = document.createElement('div');
+            episodeDiv.className = 'episode-container';
+            
+            // Fix the challenge title display
+            let challengeTitle;
+            if (currentSeason.currentEpisode === 1) {
+                challengeTitle = "Design Challenge: First Impressions";
+            } else if (currentChallenge === "GIRL_GROUP") {
+                challengeTitle = "Girl Group Challenge: Queens of Pop";
+            } else if (typeof challenge === 'string') {
+                challengeTitle = challenge;
+            } else if (challenge && challenge.name) {
+                challengeTitle = challenge.variant ? 
+                    `${challenge.name}: ${challenge.variant}` : 
+                    challenge.name;
+            } else {
+                challengeTitle = "Challenge";
+            }
+            
+            episodeDiv.innerHTML = `
+                <h2>Episode ${currentSeason.currentEpisode}</h2>
+                <div class="challenge-info">
+                    <h3>${challengeTitle}</h3>
+                    ${challenge.description ? `<p>${challenge.description}</p>` : ''}
+                    <h3>Runway Theme: ${runwayTheme}</h3>
+                </div>
+                
+                ${challenge.name === "Snatch Game" ? `
+                    <div class="snatch-game-info">
+                        <h4>Snatch Game Characters:</h4>
+                        ${performances.map(perf => `
+                            <p>${perf.queen.name} as ${perf.snatchGameCharacter}</p>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${challenge.name === "Ball Challenge" ? `
+                    <div class="ball-challenge-info">
+                        <h4>Ball Categories:</h4>
+                        ${performances[0].ballLooks.map(look => `
+                            <p>${look.category}</p>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                <div class="drama-section">
+                    <h4>Untucked Drama:</h4>
+                    <p>${drama.description}</p>
+                </div>
+
+                <div class="placements-container">
+                    <!-- Winner(s) Section -->
+                    <div class="placement-category winner-section">
+                        <h3>Winner${performances[1].placement === "WIN" ? 's' : ''}</h3>
+                        ${performances.filter(p => p.placement === "WIN").map(perf => createQueenCard(perf)).join('')}
+                    </div>
+
+                    <!-- High Placements -->
+                    ${performances.some(p => p.placement === "HIGH") ? `
+                        <div class="placement-category high-section">
+                            <h3>High</h3>
+                            ${performances.filter(p => p.placement === "HIGH").map(perf => createQueenCard(perf)).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- Safe Queens -->
+                    ${performances.some(p => p.placement === "SAFE") ? `
+                        <div class="placement-category safe-section">
+                            <h3>Safe</h3>
+                            ${performances.filter(p => p.placement === "SAFE").map(perf => createQueenCard(perf)).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- Low Queens -->
+                    ${performances.some(p => p.placement === "LOW") ? `
+                        <div class="placement-category low-section">
+                            <h3>Low</h3>
+                            ${performances.filter(p => p.placement === "LOW").map(perf => createQueenCard(perf)).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- Bottom 2 -->
+                    ${performances.some(p => p.placement === "BTM2") ? `
+                        <div class="placement-category bottom-section">
+                            <h3>Bottom 2</h3>
+                            ${performances.filter(p => p.placement === "BTM2").map(perf => createQueenCard(perf)).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Lip Sync Section with cute styling -->
+                ${performances[performances.length - 1].placement === "BTM2" ? `
+                    <div class="bottom-two-section">
+                        <h3>Lip Sync For Your Life</h3>
+                        <div class="bottom-two-queens">
+                            ${performances.slice(-2).map(perf => `
+                                <div class="bottom-queen">
+                                    <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-btm-image">
+                                    <h4>${perf.queen.name}</h4>
+                                    <div class="track-record-container">
+                                        ${createTrackRecordDisplay(perf.queen)}
+                                    </div>
+                                    <button onclick="eliminateQueen('${perf.queen.name.replace(/'/g, "\\'")}')" class="eliminate-button">
+                                        Send Home ${perf.queen.name}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="doubleShantay()" class="double-shantay-button">
+                            Double Shantay
+                        </button>
+                    </div>
+
+                    <style>
+                        .eliminate-button {
+                            background: linear-gradient(45deg, #ff4444, #ff1111);
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            font-size: 14px;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        }
+                        .eliminate-button:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                        }
+                        .double-shantay-button {
+                            background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+                            color: white;
+                            border: none;
+                            padding: 12px 30px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            font-size: 14px;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            margin-top: 20px;
+                        }
+                        .double-shantay-button:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                        }
+                    </style>
+                ` : ''}
+
+                ${currentSeason.format === 'all-stars' && performances[0].placement === "WIN" ? `
+                    <div class="bottom-two-section">
+                        <h3>Lip Sync For Your Legacy</h3>
+                        <div class="bottom-two-queens">
+                            ${performances.slice(0, 2).map(perf => `
+                                <div class="bottom-queen">
+                                    <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-btm-image">
+                                    <h4>${perf.queen.name}</h4>
+                                    <button onclick="selectLipSyncWinner('${perf.queen.name}')" class="eliminate-button">
+                                        ${perf.queen.name} Wins Lip Sync
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            container.appendChild(episodeDiv);
+            displayQueens();
+        }
+
+        function eliminateQueen(queenName) {
+            const queenIndex = currentSeason.queens.findIndex(q => q.name === queenName);
+            if (queenIndex === -1) return;
+
+            const eliminatedQueen = currentSeason.queens.splice(queenIndex, 1)[0];
+            eliminatedQueen.trackRecord[eliminatedQueen.trackRecord.length - 1] = "ELIM";
+            currentSeason.eliminatedQueens.push(eliminatedQueen);
+            
+            // Check for finale conditions
+            if (currentSeason.queens.length === 4) {
+                const topFourFinale = document.getElementById('top-four-finale')?.checked;
+                if (topFourFinale) {
+                    displayFinale();
+                } else {
+                    startNextEpisode();
+                }
+            } else if (currentSeason.queens.length === 3) {
+                displayFinale();
+            } else {
+                startNextEpisode();
+            }
+        }
+
+        function displayFinale() {
+            const container = document.getElementById('episode-display');
+            const finaleDiv = document.createElement('div');
+            finaleDiv.className = 'finale-container';
+            
+            const topThree = currentSeason.queens;
+            
+            finaleDiv.innerHTML = `
+                <h2>Grand Finale</h2>
+                <h3>Select Your Winner</h3>
+                <div class="top-three-selection">
+                    ${topThree.map(queen => `
+                        <button onclick="crownWinner('${queen.name}')">
+                            <img src="${queen.image}" alt="${queen.name}" class="queen-image">
+                            <br>
+                            Crown ${queen.name}
+                            <br>
+                            Track Record: ${createTrackRecordDisplay(queen)}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.insertBefore(finaleDiv, container.firstChild);
+        }
+
+        function crownWinner(queenName) {
+            const winner = currentSeason.queens.find(q => q.name === queenName);
+            if (!winner) return;
+            
+            winner.trackRecord.push('WINNER');
+            currentSeason.queens.forEach(queen => {
+                if (queen.name !== queenName) {
+                    queen.trackRecord.push('RUNNER-UP');
+                }
+            });
+            
+            displayQueens();
+            
+            // Display winner announcement with track record button
+            const container = document.getElementById('episode-display');
+            const winnerDiv = document.createElement('div');
+            winnerDiv.className = 'finale-container';
+            winnerDiv.innerHTML = `
+                <h2>👑 We Have a Winner! 👑</h2>
+                <h1>${queenName}</h1>
+                <p>Condragulations, you are the winner of this season!</p>
+                <button onclick="displayFullTrackRecord()" style="margin: 10px; background: #2196f3;">View Season Track Record</button>
+                <button onclick="startNewSeason()">Start New Season</button>
+            `;
+            
+            container.insertBefore(winnerDiv, container.firstChild);
+        }
+
+        function displayFullTrackRecord() {
+            // Hide the queens sidebar
+            const queensDisplay = document.getElementById('queens-display');
+            queensDisplay.style.display = 'none';
+            
+            const episodeDisplay = document.getElementById('episode-display');
+            episodeDisplay.innerHTML = '';
+            
+            // Create full screen container
+            const fullScreenDiv = document.createElement('div');
+            fullScreenDiv.className = 'full-screen-track-record';
+            
+            // Sort queens: Winner first, then current queens, then eliminated queens in reverse order
+            let sortedQueens = [];
+            
+            // Add winner if exists
+            const winner = [...currentSeason.queens, ...currentSeason.eliminatedQueens].find(queen => 
+                queen.trackRecord.includes('WINNER')
+            );
+            if (winner) sortedQueens.push(winner);
+            
+            // Add current queens (excluding winner)
+            sortedQueens = [
+                ...sortedQueens,
+                ...currentSeason.queens.filter(queen => queen !== winner)
+            ];
+            
+            // Add eliminated queens in reverse order
+            const sortedEliminatedQueens = [...currentSeason.eliminatedQueens]
+                .filter(queen => queen !== winner)
+                .reverse();
+            sortedQueens = [...sortedQueens, ...sortedEliminatedQueens];
+            
+            const trackRecordDiv = document.createElement('div');
+            trackRecordDiv.className = 'track-record-container';
+            trackRecordDiv.innerHTML = `
+                <h2 style="text-align: center; margin-bottom: 20px;">Full Season Track Record</h2>
+                <div class="track-record-grid">
+                    ${sortedQueens.map(queen => `
+                        <div class="track-record-row">
+                            <div class="queen-cell">
+                                <img src="${queen.image}" alt="${queen.name}" class="queen-mini-image">
+                            </div>
+                            <div class="queen-name">${queen.name}</div>
+                            <div class="track-record-entries">
+                                ${createTrackRecordDisplay(queen)}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="returnFromTrackRecord()" class="start-episode-button">Continue</button>
+                </div>
+            `;
+            
+            fullScreenDiv.appendChild(trackRecordDiv);
+            episodeDisplay.appendChild(fullScreenDiv);
+        }
+
+        function returnFromTrackRecord() {
+            // Show the queens sidebar again
+            const queensDisplay = document.getElementById('queens-display');
+            queensDisplay.style.display = '';
+            
+            startNextEpisode();
+        }
+
+        function doubleShantay() {
+            // Add "BTM2" to track record without elimination
+            episodePerformances.slice(-2).forEach(perf => {
+                const lastIndex = perf.queen.trackRecord.length - 1;
+                if (lastIndex >= 0) {
+                    perf.queen.trackRecord[lastIndex] = "BTM2";
+                }
+            });
+            
+            if (currentSeason.queens.length > 3) {
+                startNextEpisode();
+            } else {
+                displayFinale();
+            }
+        }
+
+        // Add this after the challengeTypes definition
+        const runwayThemes = {
+            SIGNATURE: {
+                name: "Signature Drag",
+                description: "Show us your signature drag aesthetic"
+            },
+            CATEGORIES: [
+                {
+                    name: "Night of 1000...",
+                    variants: [
+                        "Night of 1000 Madonnas",
+                        "Night of 1000 Beyoncés",
+                        "Night of 1000 Lady Gagas",
+                        "Night of 1000 Rihannas"
+                    ]
+                },
+                {
+                    name: "Color",
+                    variants: [
+                        "Red for Filth",
+                        "Pretty in Pink",
+                        "Color Blocking",
+                        "Monochromatic"
+                    ]
+                },
+                {
+                    name: "Elements",
+                    variants: [
+                        "Fire and Ice",
+                        "Mother Nature",
+                        "Weather Phenomenon",
+                        "The Four Elements"
+                    ]
+                },
+                {
+                    name: "Fashion",
+                    variants: [
+                        "High Fashion",
+                        "Vintage Couture",
+                        "Avant Garde",
+                        "Met Gala"
+                    ]
+                },
+                {
+                    name: "Culture",
+                    variants: [
+                        "Club Kid",
+                        "Drag Culture",
+                        "Pop Culture Icons",
+                        "Fantasy"
+                    ]
+                }
+            ]
+        };
+
+        // Add this new function for All Stars placements
+        function assignAllStarsPlacements(performances) {
+            // Top 2
+            performances[0].placement = "WIN";
+            performances[1].placement = "WIN_AS"; // Yellow WIN
+
+            // High and Low
+            if (performances.length > 4) {
+                performances[2].placement = "HIGH";
+                performances[performances.length - 3].placement = "LOW";
+            }
+
+            // Safe queens
+            for (let i = 3; i < performances.length - 3; i++) {
+                performances[i].placement = "SAFE";
+            }
+
+            // Bottom 2
+            performances[performances.length - 2].placement = "BTM2";
+            performances[performances.length - 1].placement = "BTM2";
+
+            // Update track records
+            performances.forEach(perf => {
+                perf.queen.trackRecord.push(perf.placement);
+            });
+        }
+
+        // Add this new function for All Stars elimination
+        function eliminateAllStarsQueen(eliminatedQueenName, winningQueenName) {
+            const queenIndex = currentSeason.queens.findIndex(q => q.name === eliminatedQueenName);
+            if (queenIndex === -1) return;
+
+            const eliminatedQueen = currentSeason.queens.splice(queenIndex, 1)[0];
+            eliminatedQueen.trackRecord[eliminatedQueen.trackRecord.length - 1] = "ELIM";
+            currentSeason.eliminatedQueens.push(eliminatedQueen);
+            
+            // Update the winning queen's status
+            const winningQueen = currentSeason.queens.find(q => q.name === winningQueenName);
+            if (winningQueen) {
+                const lastIndex = winningQueen.trackRecord.length - 1;
+                if (lastIndex >= 0) {
+                    winningQueen.trackRecord[lastIndex] = "WIN";
+                }
+            }
+            
+            if (currentSeason.queens.length === 4) {
+                displayFinale();
+            } else {
+                startNextEpisode();
+            }
+        }
+
+        // Add this new function for All Stars lip sync winner selection
+        function selectLipSyncWinner(queenName) {
+            const bottomQueens = episodePerformances.slice(-2);
+            const container = document.getElementById('episode-display');
+            
+            container.innerHTML += `
+                <div class="elimination-choice">
+                    <h3>${queenName} won the lip sync!</h3>
+                    <h4>Choose which bottom queen to eliminate:</h4>
+                    <div class="bottom-two-queens">
+                        ${bottomQueens.map(perf => `
+                            <div class="bottom-queen">
+                                <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-btm-image">
+                                <h4>${perf.queen.name}</h4>
+                                <div class="track-record">
+                                    ${createTrackRecordDisplay(perf.queen)}
+                                </div>
+                                <button onclick="eliminateAllStarsQueen('${perf.queen.name}', '${queenName}')" class="eliminate-button">
+                                    Eliminate ${perf.queen.name}
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add new function for All Stars lip sync winner selection
+        function selectAllStarsLipSyncWinner(queenName) {
+            if (topThreeSelected) return;
+            topThreeSelected = true;
+
+            const winnerIndex = episodePerformances.findIndex(p => p.queen.name === queenName);
+            const loserIndex = winnerIndex === 0 ? 1 : 0;
+
+            // Mark the winner and runner-up
+            episodePerformances[winnerIndex].placement = "WIN";
+            episodePerformances[loserIndex].placement = "WIN";
+            episodePerformances[loserIndex].runnerUp = true;
+
+            // Assign other placements
+            episodePerformances[2].placement = "HIGH";
+            
+            // Assign SAFE placements
+            for (let i = 3; i < episodePerformances.length - 3; i++) {
+                episodePerformances[i].placement = "SAFE";
+            }
+
+            // Assign bottom placements
+            if (episodePerformances.length > 5) {
+                episodePerformances[episodePerformances.length - 3].placement = "LOW";
+                episodePerformances[episodePerformances.length - 2].placement = "BTM2";
+                episodePerformances[episodePerformances.length - 1].placement = "BTM2";
+            } else {
+                episodePerformances[3].placement = "BTM2";
+                episodePerformances[4].placement = "BTM2";
+            }
+
+            displayAllStarsBottom(episodePerformances, queenName);
+        }
+
+        // Add new function to display bottom queens
+        function displayAllStarsBottom(performances, lipSyncWinner) {
+            const container = document.getElementById('episode-display');
+            const bottomSection = document.createElement('div');
+            bottomSection.className = 'episode-container';
+
+            const lowQueen = performances.find(p => p.placement === "LOW");
+            const bottomQueens = performances.filter(p => p.placement === "BTM2");
+
+            bottomSection.innerHTML = `
+                <div class="placements-container">
+                    <div class="placement-category bottom-section">
+                        <h3>⚠️ Bottom 3 ⚠️</h3>
+                        ${lowQueen ? `
+                            <div class="queen-performance">
+                                ${createQueenCard(lowQueen)}
+                                <div class="track-record">
+                                    ${createTrackRecordDisplay(lowQueen.queen)}
+                                </div>
+                                <div class="announcement">
+                                    <h4>${lowQueen.queen.name}... you are safe.</h4>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <h3>🔴 Bottom 2 🔴</h3>
+                        <div class="bottom-two-queens">
+                            ${bottomQueens.map(perf => `
+                                <div class="bottom-queen">
+                                    <img src="${perf.queen.image}" alt="${perf.queen.name}" class="queen-btm-image">
+                                    <h4>${perf.queen.name}</h4>
+                                    <div class="track-record">
+                                        ${createTrackRecordDisplay(perf.queen)}
+                                    </div>
+                                    <button onclick="eliminateAllStarsQueen('${perf.queen.name}', '${lipSyncWinner}')" 
+                                        class="eliminate-button">
+                                        Eliminate ${perf.queen.name}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(bottomSection);
+
+            // Update track records
+            performances.forEach(perf => {
+                if (perf.placement === "WIN") {
+                    if (perf.runnerUp) {
+                        if (!perf.queen.runnerUpWins) perf.queen.runnerUpWins = [];
+                        perf.queen.runnerUpWins.push(perf.queen.trackRecord.length);
+                    }
+                    perf.queen.trackRecord.push("WIN");
+                } else {
+                    perf.queen.trackRecord.push(perf.placement);
+                }
+            });
+
+            displayQueens();
+        }
+
+        // Add these new functions without modifying existing ones
+
+        function handleReturningQueen() {
+            const container = document.getElementById('episode-display');
+            container.innerHTML = '';
+            
+            const episodeDiv = document.createElement('div');
+            episodeDiv.className = 'episode-container';
+            
+            // Only allow returns if there are eliminated queens
+            if (currentSeason.eliminatedQueens.length === 0) {
+                startEpisode();
+                return;
+            }
+
+            episodeDiv.innerHTML = `
+                <h2>Episode ${currentSeason.currentEpisode} - The Return</h2>
+                <div class="challenge-info">
+                    <h3>Return Challenge</h3>
+                    <p>Eliminated queens compete in a Talent Show for a chance to return!</p>
+                </div>
+                <div class="returning-queens">
+                    ${currentSeason.eliminatedQueens.map(queen => `
+                        <div class="queen-performance">
+                            <img src="${queen.image}" alt="${queen.name}" class="queen-performance-image">
+                            <div class="queen-performance-details">
+                                <h4>${queen.name}</h4>
+                                <div class="track-record">
+                                    ${createTrackRecordDisplay(queen)}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button onclick="determineReturningQueen()" class="start-episode-button">Start Return Challenge</button>
+            `;
+            
+            container.appendChild(episodeDiv);
+        }
+
+        function determineReturningQueen() {
+            // Calculate performances for eliminated queens
+            const returnPerformances = currentSeason.eliminatedQueens.map(queen => ({
+                queen: queen,
+                challengeScore: calculateChallengePerformance(queen, "Talent Show"),
+                runwayScore: queen.stats.runway + (Math.random() * 2 - 1),
+                totalScore: 0
+            }));
+
+            // Calculate total scores
+            returnPerformances.forEach(perf => {
+                perf.totalScore = perf.challengeScore * 0.7 + perf.runwayScore * 0.3;
+            });
+
+            // Sort by performance
+            returnPerformances.sort((a, b) => b.totalScore - a.totalScore);
+            
+            // Select returning queen
+            const returningQueen = returnPerformances[0].queen;
+            
+            // Fill in missed episodes with empty track record
+            const missedEpisodes = currentSeason.currentEpisode - returningQueen.trackRecord.length - 1;
+            for (let i = 0; i < missedEpisodes; i++) {
+                returningQueen.trackRecord.push('');
+            }
+            
+            // Add RETURN to track record for current episode
+            returningQueen.trackRecord.push("RETURN");
+            
+            // Remove from eliminated queens and add back to competition
+            currentSeason.eliminatedQueens = currentSeason.eliminatedQueens.filter(
+                queen => queen.name !== returningQueen.name
+            );
+            currentSeason.queens.push(returningQueen);
+            
+            // Display results
+            const container = document.getElementById('episode-display');
+            container.innerHTML = `
+                <div class="episode-container">
+                    <h2>Return Challenge Results</h2>
+                    <div class="winner-announcement">
+                        <img src="${returningQueen.image}" alt="${returningQueen.name}" class="queen-image">
+                        <h3>${returningQueen.name} wins the challenge and returns to the competition!</h3>
+                    </div>
+                    <button onclick="startNextEpisode()" class="start-episode-button">Continue</button>
+                </div>
+            `;
+            
+            // Update queens display
+            displayQueens();
+        }
+
+        // Also add this to your initial page load
+        window.onload = function() {
+            startNewSeason();
+        }
+
+        function filterQueens(searchTerm) {
+            const queenOptions = document.querySelectorAll('.queen-option');
+            searchTerm = searchTerm.toLowerCase();
+            
+            queenOptions.forEach(option => {
+                const queenName = JSON.parse(option.dataset.queen).name.toLowerCase();
+                if (queenName.includes(searchTerm)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        const girlGroupChallenge = {
+            name: "Girl Group Challenge",
+            description: "Queens must write lyrics, record vocals, and perform choreography in groups",
+            stats: ["dance", "performance", "charisma", "branding"],
+            
+            verses: [
+                "Serving face and body, I'm the queen to beat",
+                "Coming for the crown, watch me snatch it clean",
+                "Fierce and fabulous, that's my destiny",
+                "Slay the game, leave them all gagged, you'll see",
+                "Watch me work it out, I'm here to stay",
+                "Bringing drama, mama, sickening display",
+                "Top of my game, can't nobody compare",
+                "Strutting down the runway, giving them flair"
+            ],
+            
+            hooks: [
+                "We're the queens of the night (werk!)",
+                "Drag race divas, shining bright (yes!)",
+                "Slay, serve, fierce, divine (oh!)",
+                "Watch these queens all shine (werk!)"
+            ],
+            
+            danceStyles: [
+                "voguing",
+                "waacking",
+                "hip-hop",
+                "contemporary",
+                "jazz funk",
+                "heels choreography"
+            ]
+        };
+
+        function evaluateGirlGroupPerformance(queen) {
+            console.log("=== GIRL GROUP EVALUATION START ===");
+            console.log("Evaluating queen:", queen.name);
+            
+            const baseScore = calculateChallengePerformance(queen, "Girl Group Challenge");
+            console.log("Base score:", baseScore);
+            
+            const vocalAbility = (queen.stats.performance * 0.7 + queen.stats.charisma * 0.3) + (Math.random() * 2 - 1);
+            const choreographyScore = (queen.stats.dance * 0.7 + queen.stats.performance * 0.3) + (Math.random() * 2 - 1);
+            const presenceScore = (queen.stats.charisma * 0.7 + queen.stats.branding * 0.3) + (Math.random() * 2 - 1);
+            
+            console.log("Calculated scores:", {
+                vocals: vocalAbility,
+                choreography: choreographyScore,
+                presence: presenceScore
+            });
+
+            const selectedVerse = girlGroupChallenge.verses[Math.floor(Math.random() * girlGroupChallenge.verses.length)];
+            const selectedDanceStyle = girlGroupChallenge.danceStyles[Math.floor(Math.random() * girlGroupChallenge.danceStyles.length)];
+            
+            const performance = {
+                vocals: Math.min(10, vocalAbility),
+                choreography: Math.min(10, choreographyScore),
+                presence: Math.min(10, presenceScore),
+                verse: selectedVerse,
+                danceStyle: selectedDanceStyle
+            };
+            
+            console.log("Performance object:", performance);
+
+            const finalScore = (
+                (performance.vocals * 0.3) +
+                (performance.choreography * 0.4) +
+                (performance.presence * 0.3) +
+                baseScore
+            ) / 2;
+
+            const result = {
+                score: finalScore,
+                performance: performance,
+                critiques: generateGirlGroupCritiques(performance),
+                vocals: performance.vocals,
+                choreography: performance.choreography,
+                presence: performance.presence,
+                verse: performance.verse
+            };
+
+            console.log("Final result object:", result);
+            console.log("=== GIRL GROUP EVALUATION END ===");
+            return result;
+        }
+
+        function generateGirlGroupCritiques(performance) {
+            const critiques = [];
+            
+            // Vocal critiques
+            if (performance.vocals >= 8) {
+                critiques.push("Your vocals were absolutely stunning!");
+            } else if (performance.vocals >= 6) {
+                critiques.push("Your vocals were solid, but could use more power.");
+            } else {
+                critiques.push("The vocals needed more work and confidence.");
+            }
+            
+            // Choreography critiques
+            if (performance.choreography >= 8) {
+                critiques.push(`Your ${performance.danceStyle} moves were executed flawlessly!`);
+            } else if (performance.choreography >= 6) {
+                critiques.push(`The ${performance.danceStyle} choreography was good, but needed more precision.`);
+            } else {
+                critiques.push(`You struggled with the ${performance.danceStyle} choreography.`);
+            }
+            
+            // Stage presence critiques
+            if (performance.presence >= 8) {
+                critiques.push("Your stage presence was magnetic!");
+            } else if (performance.presence >= 6) {
+                critiques.push("You had moments of great energy, but it wasn't consistent.");
+            } else {
+                critiques.push("You seemed to fade into the background.");
+            }
+            
+            return critiques;
+        }
+
+        // Update the GIRL_GROUP entry in challengeTypes
+        challengeTypes["GIRL_GROUP"] = {
+            name: "Girl Group Challenge",
+            description: "Write and perform an original verse in a girl group number",
+            variants: [
+                "Queens of Pop",
+                "Girl Groups Through Time",
+                "Drag Race Supergroup",
+                "Pop Diva Tribute",
+                "Eurovision Eleganza",
+                "K-Pop Queens",
+                "Spice Up Your Life"
+            ],
+            stats: ["dance", "performance", "charisma", "branding"],
+            evaluate: evaluateGirlGroupPerformance
+        };
+
+        // Add this log to verify the variants are properly set
+        console.log("Girl Group Challenge config:", challengeTypes["GIRL_GROUP"]);
+
+        // Modify your existing episode generation to include detailed girl group performances
+        function generateGirlGroupEpisode() {
+            const performances = currentSeason.queens.map(queen => {
+                const result = evaluateGirlGroupPerformance(queen);
+                return {
+                    queen: queen,
+                    score: result.score,
+                    performance: result.performance,
+                    critiques: result.critiques
+                };
+            });
+        
+            // Sort performances by score
+            performances.sort((a, b) => b.score - a.score);
+        
+            // Generate episode content
+            return {
+                type: "GIRL_GROUP",
+                title: "Girl Group Challenge",
+                performances: performances,
+                hook: girlGroupChallenge.hooks[Math.floor(Math.random() * girlGroupChallenge.hooks.length)]
+            };
+        }
+
+        function displayChallengePerformances(performances) {
+            console.log("Starting challenge display with currentChallenge:", currentChallenge);
+            console.log("Performances:", performances);
+            
+            let html = '';
+            
+            if (currentChallenge === "GIRL_GROUP") {
+                console.log("Displaying girl group challenge content");
+                html += `
+                    <div class="challenge-info">
+                        <h4>Girl Group Challenge</h4>
+                        <p>The queens must write and perform their own verses in a girl group number!</p>
+                        <div class="group-performance">
+                            <h3>Group Hook:</h3>
+                            <p class="hook-lyrics">${girlGroupChallenge.hooks[Math.floor(Math.random() * girlGroupChallenge.hooks.length)]}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Display each queen's performance
+                performances.forEach(performance => {
+                    const queenPerf = evaluateGirlGroupPerformance(performance.queen);
+                    html += `
+                        <div class="queen-performance">
+                            <div class="queen-performance-image">
+                                <img src="${performance.queen.image}" alt="${performance.queen.name}" class="queen-performance-image">
+                            </div>
+                            <div class="queen-performance-details">
+                                <h4>${performance.queen.name}</h4>
+                                <div class="verse-section">
+                                    <p class="verse-title">Verse:</p>
+                                    <p class="verse-lyrics">${queenPerf.performance.verse}</p>
+                                </div>
+                                <div class="performance-scores">
+                                    <p>Vocals: ${queenPerf.performance.vocals.toFixed(1)}/10</p>
+                                    <p>Choreography (${queenPerf.performance.danceStyle}): ${queenPerf.performance.choreography.toFixed(1)}/10</p>
+                                    <p>Stage Presence: ${queenPerf.performance.presence.toFixed(1)}/10</p>
+                                </div>
+                                <div class="critiques">
+                                    ${queenPerf.critiques.map(critique => `<p>• ${critique}</p>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Add specific styling for girl group challenge
+                html += `
+                    <style>
+                        .hook-lyrics {
+                            font-style: italic;
+                            font-size: 1.1em;
+                            color: #9c27b0;
+                            margin: 10px 0;
+                            padding: 10px;
+                            background: #f8f8f8;
+                            border-radius: 5px;
+                        }
+                        
+                        .verse-section {
+                            margin: 10px 0;
+                            padding: 10px;
+                            background: #f0f0f0;
+                            border-radius: 5px;
+                        }
+                        
+                        .verse-title {
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .verse-lyrics {
+                            font-style: italic;
+                            color: #666;
+                        }
+                        
+                        .performance-scores {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 10px;
+                            margin: 10px 0;
+                        }
+                        
+                        .performance-scores p {
+                            margin: 0;
+                            padding: 5px;
+                            background: #f8f8f8;
+                            border-radius: 3px;
+                            text-align: center;
+                        }
+                        
+                        .critiques {
+                            margin-top: 10px;
+                            padding-top: 10px;
+                            border-top: 1px solid #eee;
+                        }
+                        
+                        .critiques p {
+                            margin: 3px 0;
+                            color: #555;
+                        }
+                    </style>
+                `;
+            } else {
+                console.log("Displaying regular challenge content");
+                // Your existing performance display code for other challenges
+                performances.forEach(performance => {
+                    html += `
+                        <div class="queen-performance">
+                            <div class="queen-performance-image">
+                                <img src="${performance.queen.image}" alt="${performance.queen.name}" class="queen-performance-image">
+                            </div>
+                            <div class="queen-performance-details">
+                                <h4>${performance.queen.name}</h4>
+                                <p>Score: ${performance.score.toFixed(2)}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            return html;
+        }
+
+        // Add this log to check if the challenge type is properly registered
+        console.log("Available challenge types:", Object.keys(challengeTypes));
+
+        // Add this near where other challenge data is defined
+        const rusicalChallenges = {
+            roles: [
+                {
+                    name: "Lead Role",
+                    difficulty: 3,
+                    description: "The star of the show with the most lines and solos",
+                    performanceAspects: ["vocals", "acting", "presence"]
+                },
+                {
+                    name: "Comedy Relief",
+                    difficulty: 2,
+                    description: "A fun character that brings humor to the show",
+                    performanceAspects: ["comedy", "acting", "presence"]
+                },
+                {
+                    name: "Dramatic Diva",
+                    difficulty: 2.5,
+                    description: "An emotional character with powerful ballads",
+                    performanceAspects: ["vocals", "acting", "emotion"]
+                },
+                {
+                    name: "Dance Captain",
+                    difficulty: 2,
+                    description: "Less singing but complex choreography",
+                    performanceAspects: ["dance", "presence", "coordination"]
+                },
+                {
+                    name: "Ensemble Leader",
+                    difficulty: 1.5,
+                    description: "Guides the group numbers with moderate solos",
+                    performanceAspects: ["vocals", "dance", "leadership"]
+                },
+                {
+                    name: "Supporting Role",
+                    difficulty: 1,
+                    description: "Important to the story with fewer spotlight moments",
+                    performanceAspects: ["acting", "vocals", "versatility"]
+                }
+            ],
+            themes: [
+                {
+                    name: "Social Media: The Unauthorized Rusical",
+                    description: "A musical journey through the rise and drama of social media platforms",
+                    roles: ["TikTok Star", "Instagram Influencer", "Twitter Drama Queen", "YouTube Guru", "Facebook Mom", "Snapchat Ghost"]
+                },
+                {
+                    name: "Drag Through The Ages",
+                    description: "A historical musical about the evolution of drag culture",
+                    roles: ["Ancient Queen", "Vaudeville Star", "Club Kid Icon", "Pageant Legend", "Modern Influencer", "Future Queen"]
+                },
+                {
+                    name: "Reality TV Queens",
+                    description: "A musical parody of iconic reality TV moments",
+                    roles: ["Drama Starter", "Confessional Queen", "Challenge Winner", "Villain Edit", "Fan Favorite", "First Eliminated"]
+                }
+            ]
+        };
+    </script>
+</body>
+</html>
